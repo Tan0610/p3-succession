@@ -1,4 +1,4 @@
-import type { Wallet } from 'ethers'
+import type { BaseWallet } from 'ethers'
 import { hashCanonical, utf8 } from './canonical.js'
 import { nextCatalogue, renderCatalogueCsv, renderCatalogueHtml } from './catalogue.js'
 import { resolveNextIndex, type FeedWriteStore, type Identity, type SocProof } from './feedstore.js'
@@ -226,7 +226,7 @@ export function addSeal(proposal: HandoffProposal, charter: Charter, library: Li
   return { ...proposal, approvals: [...proposal.approvals.filter((a) => a.library !== library), approval] }
 }
 
-export async function sealWith(proposal: HandoffProposal, charter: Charter, library: LibraryId, wallet: Wallet) {
+export async function sealWith(proposal: HandoffProposal, charter: Charter, library: LibraryId, wallet: BaseWallet) {
   return addSeal(proposal, charter, library, await signText(wallet, proposal.statement))
 }
 
@@ -238,7 +238,7 @@ export function addAcceptance(proposal: HandoffProposal, signature: string): Han
   return { ...proposal, acceptance: { address: proposal.fields.incoming.address, signature } }
 }
 
-export async function acceptWith(proposal: HandoffProposal, wallet: Wallet) {
+export async function acceptWith(proposal: HandoffProposal, wallet: BaseWallet) {
   return addAcceptance(proposal, await signText(wallet, proposal.statement))
 }
 

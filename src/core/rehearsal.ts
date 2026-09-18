@@ -32,7 +32,7 @@ export interface Cast {
 /** Throwaway identities for a rehearsal. They exist only in memory. */
 export function makeEphemeralCast(): Cast {
   const id = (name: string): Identity => {
-    const wallet = Wallet.createRandom() as unknown as Wallet
+    const wallet = Wallet.createRandom()
     return { name, address: wallet.address, wallet }
   }
   return {

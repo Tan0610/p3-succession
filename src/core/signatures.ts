@@ -1,4 +1,4 @@
-import { getAddress, verifyMessage, type Wallet } from 'ethers'
+import { getAddress, verifyMessage, type BaseWallet } from 'ethers'
 import type { Approval, Charter, LibraryId, RegistryEntry } from './schemas.js'
 import { sameAddress } from './swarm.js'
 
@@ -7,7 +7,7 @@ import { sameAddress } from './swarm.js'
  * so a committee member can sign in MetaMask, Frame or a hardware wallet and
  * paste the result. (bee-js's PrivateKey.sign is only used for feed chunks.)
  */
-export async function signText(wallet: Wallet, text: string): Promise<string> {
+export async function signText(wallet: BaseWallet, text: string): Promise<string> {
   return wallet.signMessage(text)
 }
 

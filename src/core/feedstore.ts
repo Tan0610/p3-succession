@@ -1,4 +1,4 @@
-import type { Wallet } from 'ethers'
+import type { BaseWallet } from 'ethers'
 
 /**
  * An identity that can sign. The private key lives inside the ethers Wallet and
@@ -7,7 +7,7 @@ import type { Wallet } from 'ethers'
 export interface Identity {
   name: string
   address: string
-  wallet: Wallet
+  wallet: BaseWallet
 }
 
 export interface SocProof {
