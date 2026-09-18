@@ -58,14 +58,44 @@ export class BeeFeedStore implements FeedWriteStore {
 
   async latestIndex(owner: string, topicHex: string): Promise<bigint | null> {
     try {
-      // a 404 is a real answer (empty feed); anything else is worth another try
+      // a 404 is an answer (see below); anything else is worth another try
       const update = await withRetry(() => this.bee.feed.makeReader(topicHex, owner).downloadReference(), { ...this.retry, retryIf: (e) => !isNotFound(e) })
       return update.feedIndex.toBigInt()
     } catch (e) {
-      // A feed with no updates yet answers 404: that is "start at #0", not an error.
-      if (isNotFound(e)) return null
+      if (!isNotFound(e)) throw e
+      // Bee 2.8 answers 404 both for "this feed has no updates" and for "the
+      // lookup failed" (e.g. a retrieval timeout). Treating the second as empty
+      // would make the next write land on #0 again. So ask for update #0 itself.
+      if (!(await this.hasUpdate(owner, topicHex, 0n))) return null
+      return this.probeLatest(owner, topicHex)
+    }
+  }
+
+  /** Is feed update #index on the network? Reads the signed chunk directly, no lookup involved. */
+  async hasUpdate(owner: string, topicHex: string, index: bigint): Promise<boolean> {
+    try {
+      await this.bee.chunk.download(feedUpdateAddress(owner, topicHex, index))
+      return true
+    } catch (e) {
+      if (isNotFound(e) || (e instanceof BeeResponseError && e.status === 500)) return false
       throw e
     }
+  }
+
+  /** Latest index by reading chunks: gallop 1, 2, 4, … to the first miss, then binary-search. Feeds have no gaps. */
+  private async probeLatest(owner: string, topicHex: string): Promise<bigint> {
+    let lo = 0n
+    let hi = 1n
+    while (await this.hasUpdate(owner, topicHex, hi)) {
+      lo = hi
+      hi *= 2n
+    }
+    while (hi - lo > 1n) {
+      const mid = (lo + hi) / 2n
+      if (await this.hasUpdate(owner, topicHex, mid)) lo = mid
+      else hi = mid
+    }
+    return lo
   }
 
   async readRefAt(owner: string, topicHex: string, index: bigint): Promise<string> {

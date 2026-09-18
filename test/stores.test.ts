@@ -12,8 +12,18 @@ import { BeeFeedStore } from '../src/node/bee.js'
 const topic = topicHex(TOPICS.catalogue)
 const owner = Wallet.createRandom().address
 
-function fakeBee(behaviour: () => Promise<unknown>): Bee {
-  return { url: 'http://fake', feed: { makeReader: () => ({ downloadReference: behaviour }) } } as unknown as Bee
+/** A Bee whose feed lookup does `behaviour`, and whose chunk store holds updates #0 … #(stored-1) of `owner`'s feed. */
+function fakeBee(behaviour: () => Promise<unknown>, stored = 0n): Bee {
+  const present = new Set(Array.from({ length: Number(stored) }, (_, i) => feedUpdateAddress(owner, topic, BigInt(i))))
+  const download = async (address: string) => {
+    if (present.has(address)) return new Uint8Array(8)
+    throw new BeeResponseError('GET', `chunks/${address}`, 'not found', undefined, 404)
+  }
+  return { url: 'http://fake', feed: { makeReader: () => ({ downloadReference: behaviour }) }, chunk: { download } } as unknown as Bee
+}
+
+const lookupFailed = async () => {
+  throw new BeeResponseError('GET', 'feeds', 'lookup at failed', undefined, 404)
 }
 
 describe('next index is read from the network', () => {
@@ -54,6 +64,17 @@ describe('next index is read from the network', () => {
     expect((await resolveNextIndex(m, w.address, topic)).next).toBe(0n)
     await m.writeRef({ name: 'x', address: w.address, wallet: w }, topic, 0n, 'ab'.repeat(32))
     expect((await resolveNextIndex(m, w.address, topic)).next).toBe(1n)
+  })
+
+  it('a 404 from a failed lookup is not mistaken for an empty feed: the chunks are read directly', async () => {
+    // Bee 2.8 answers 404 for a lookup timeout too. Updates #0..#4 exist.
+    expect(await resolveNextIndex(new BeeFeedStore(fakeBee(lookupFailed, 5n), null), owner, topic)).toEqual({ latest: 4n, next: 5n })
+  })
+
+  it('a lookup that lags behind never makes a write land on a used index', async () => {
+    const stale = async () => ({ reference: new Reference('ab'.repeat(32)), feedIndex: FeedIndex.fromBigInt(1n), feedIndexNext: FeedIndex.fromBigInt(2n) })
+    // the lookup says #1, but #2 and #3 are already on the network
+    expect(await resolveNextIndex(new BeeFeedStore(fakeBee(stale, 4n), null), owner, topic)).toEqual({ latest: 3n, next: 4n })
   })
 
   it('writing without a batch fails loudly (the payer must be configured)', async () => {

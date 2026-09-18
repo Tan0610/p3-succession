@@ -34,6 +34,8 @@ export interface FeedReadStore {
   readJson(ref: string, path?: string): Promise<unknown>
   /** Signed single-owner-chunk behind a feed update, for evidence. */
   socProof?(owner: string, topicHex: string, index: bigint): Promise<SocProof>
+  /** Whether update #index exists, read directly rather than through a feed lookup. */
+  hasUpdate?(owner: string, topicHex: string, index: bigint): Promise<boolean>
 }
 
 /**
@@ -59,5 +61,9 @@ export async function resolveNextIndex(
   topicHex: string,
 ): Promise<{ latest: bigint | null; next: bigint }> {
   const latest = await store.latestIndex(owner, topicHex)
-  return { latest, next: latest === null ? 0n : latest + 1n }
+  let next = latest === null ? 0n : latest + 1n
+  // A lookup can lag behind the network. If the slot we are about to write is
+  // already taken, move past it rather than sign a second version of it.
+  if (store.hasUpdate) while (await store.hasUpdate(owner, topicHex, next)) next++
+  return { latest: next === 0n ? null : next - 1n, next }
 }
