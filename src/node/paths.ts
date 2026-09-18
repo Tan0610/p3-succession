@@ -1,4 +1,4 @@
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
@@ -21,3 +21,8 @@ export const PATHS = {
   readme: join(ROOT, 'README.md'),
   readWithoutUs: join(ROOT, 'docs', 'READ_WITHOUT_US.md'),
 } as const
+
+/** A repo-relative path with forward slashes, so tracked files read the same on Windows and elsewhere. */
+export function repoPath(path: string): string {
+  return relative(ROOT, path).replace(/\\/g, '/')
+}

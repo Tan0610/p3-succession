@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join, relative } from 'node:path'
 import { Wallet } from 'ethers'
 import type { Identity } from '../core/feedstore.js'
-import { PATHS, ROOT } from './paths.js'
+import { PATHS, repoPath, ROOT } from './paths.js'
 
 /**
  * Where private keys live. In order of preference:
@@ -38,13 +38,13 @@ export function assertIgnored(path: string): void {
 
 export function newKey(name: string): { name: string; address: string; path: string } {
   const path = keyPath(name)
-  if (existsSync(path)) throw new Error(`${name} already has a key at ${relative(ROOT, path)}; not overwriting it.`)
+  if (existsSync(path)) throw new Error(`${name} already has a key at ${repoPath(path)}; not overwriting it.`)
   mkdirSync(PATHS.keys, { recursive: true })
   assertIgnored(path)
   const hex = `0x${randomBytes(32).toString('hex')}`
   const wallet = new Wallet(hex)
   writeFileSync(path, `${hex}\n`, { mode: 0o600 })
-  return { name, address: wallet.address, path: relative(ROOT, path) }
+  return { name, address: wallet.address, path: repoPath(path) }
 }
 
 export function loadIdentity(name: string, displayName: string, keyFile?: string): Identity {

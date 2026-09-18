@@ -3,18 +3,19 @@
  *
  *   npm run ceremony -- --rehearse      in memory, ephemeral keys, nothing leaves the process
  *   npm run ceremony -- --live --yes    against the Bee node: real keys, real feeds, real evidence
+ *        [--incoming <steward key name | 0x address>]   who takes over (default steward-padma, or LSC_INCOMING)
+ *        [--next <steward>] [--first <steward>]          who they name next, and who held it first
  *
  * The live run is resumable: each stage checks the network first and is skipped
  * if it already happened.
  */
 import { writeFileSync } from 'node:fs'
-import { relative } from 'node:path'
 import { parseArgs } from 'node:util'
 import { MemoryFeedStore } from '../src/core/memory-feedstore.js'
 import { performHandoff, QuorumRejected } from '../src/core/operations.js'
 import { makeEphemeralCast, rehearse } from '../src/core/rehearsal.js'
 import { readRegistry } from '../src/core/resolve.js'
-import { signText } from '../src/core/signatures.js'
+import { requiredThreshold, signText } from '../src/core/signatures.js'
 import { sameAddress } from '../src/core/swarm.js'
 import { auditSecrets } from '../src/node/audit.js'
 import { BeeFeedStore } from '../src/node/bee.js'
@@ -28,6 +29,7 @@ import {
   keysInit,
   propose,
   read,
+  recoverHandoffRecords,
   signWithKey,
   storageExtend,
   storageStatusCmd,
@@ -36,7 +38,7 @@ import {
 import { charterFromConfig, loadSeed, requireAnchor, stewardByKey } from '../src/node/config.js'
 import { loadProposal, rehearsalPath, saveProposal } from '../src/node/evidence.js'
 import { loadIdentity } from '../src/node/keys.js'
-import { ROOT } from '../src/node/paths.js'
+import { repoPath } from '../src/node/paths.js'
 import { quoteExtend, readLedger, waitUntilUsable } from '../src/node/storage.js'
 
 const { values: args } = parseArgs({
@@ -46,6 +48,10 @@ const { values: args } = parseArgs({
     yes: { type: 'boolean' },
     'extend-days': { type: 'string', default: '1' },
     bee: { type: 'string' },
+    // the succession itself is parameterised: steward key names (steward-padma) or addresses (0x…)
+    first: { type: 'string', default: 'steward-ngawang' },
+    incoming: { type: 'string', default: process.env.LSC_INCOMING ?? 'steward-padma' },
+    next: { type: 'string', default: 'steward-stanzin' },
   },
 })
 
@@ -53,6 +59,19 @@ const extendDays = Number(args['extend-days'])
 if (!Number.isFinite(extendDays) || extendDays <= 0) throw new Error('--extend-days must be a positive number')
 
 const say = (s: string) => console.log(s)
+
+/** A steward from stewardship.config.json, named by key name or by address. */
+function stewardArg(c: Ctx, value: string, flag: string) {
+  const s = value.startsWith('0x') ? c.config.stewards.find((x) => sameAddress(x.address, value)) : stewardByKey(c.config, value)
+  if (!s?.address) throw new Error(`${flag} ${value}: no steward with that key name or address in stewardship.config.json`)
+  return s
+}
+
+/** A hand-off the network has but this checkout has no record of (the run was cut off mid-write). */
+async function recoverInterrupted(c: Ctx) {
+  const recovered = await recoverHandoffRecords(c)
+  if (recovered.length) say(`recovered evidence from the network for ${recovered.join(', ')} (an earlier run stopped after the registry write)`)
+}
 const act = (s: string) => console.log(`\n── ${s} ${'─'.repeat(Math.max(0, 66 - s.length))}`)
 
 async function rehearseAll() {
@@ -80,7 +99,7 @@ async function rehearseAll() {
     path,
     JSON.stringify({ mode: 'rehearsal', note: 'In-memory rehearsal with throwaway keys. Not evidence of a live hand-off.', ...r, finalView: undefined, lineage: stewards }, null, 2),
   )
-  say(`\nrehearsal passed · summary in ${relative(ROOT, path)} (git-ignored)`)
+  say(`\nrehearsal passed · summary in ${repoPath(path)} (git-ignored)`)
 }
 
 async function live() {
@@ -114,55 +133,61 @@ async function live() {
   c = fresh()
   const anchor = requireAnchor(c.config)
   const readStore = new BeeFeedStore(c.bee, null)
-  const st = (k: string) => stewardByKey(c.config, k)
-  const ngawang = st('steward-ngawang')
-  const padma = st('steward-padma')
-  const stanzin = st('steward-stanzin')
+  // Who is who comes from the command line (or LSC_INCOMING), not from this file.
+  const first = stewardArg(c, args.first!, '--first')
+  const incoming = stewardArg(c, args.incoming!, '--incoming')
+  const next = stewardArg(c, args.next!, '--next')
+  if (new Set([first.address, incoming.address, next.address]).size !== 3) throw new Error('--first, --incoming and --next must be three different stewards')
+  say(`first steward ${first.name} ${first.address}\nincoming      ${incoming.name} ${incoming.address}  (named by --incoming)\nnext after    ${next.name} ${next.address}`)
+  await recoverInterrupted(c)
 
-  act('2. Genesis: four libraries seal, Ngawang accepts and names Padma')
+  act(`2. Genesis: four libraries seal, ${first.name} accepts and names ${incoming.name}`)
   if ((await readRegistry(readStore, anchor)).current) say('already done')
   else {
-    const { path } = await propose(c, { incoming: ngawang.address!, next: padma.address!, trigger: 'T0-genesis' })
+    const { path } = await propose(c, { incoming: first.address!, next: incoming.address!, trigger: 'T0-genesis' })
     for (const lib of ['hemis', 'thiksey', 'diskit', 'lamayuru']) await signWithKey({ proposal: path, as: lib })
-    await accept({ proposal: path, as: 'steward-ngawang' })
-    await handoff(fresh(), { proposal: path, incoming: ngawang.address! })
+    await accept({ proposal: path, as: first.keyName })
+    await handoff(fresh(), { proposal: path, incoming: first.address! })
   }
 
-  act('3. Ngawang publishes the catalogue')
+  act(`3. ${first.name} publishes the catalogue`)
   c = fresh()
-  if ((await readStore.latestIndex(ngawang.address!, anchor.catalogueTopicHex)) !== null) say('already published')
-  else await cataloguePublish(c, { as: 'steward-ngawang' })
+  if ((await readStore.latestIndex(first.address!, anchor.catalogueTopicHex)) !== null) say('already published')
+  else await cataloguePublish(c, { as: first.keyName })
 
   act('4. Tabo and Kye post signed corrections, without the steward')
-  const taboLatest = await readStore.latestIndex(c.config.libraries.find((l) => l.id === 'tabo')!.address!, anchor.correctionsTopicHex)
-  if (taboLatest !== null) say('already posted')
-  else {
-    const seed = loadSeed()
-    const taboRec = seed.records.find((r) => r.library === 'tabo')!
-    const hemisRec = seed.records.find((r) => r.library === 'hemis')!
-    await correctionSubmit(c, { as: 'tabo', record: taboRec.id, set: ['condition=damaged', 'photographed=true'], note: 'Water stain on the last twelve folios after the spring leak.' })
-    await correctionSubmit(c, { as: 'kye', record: hemisRec.id, set: [], note: 'Kye holds a second copy of this text; worth comparing.' })
+  const seed = loadSeed()
+  const corrections = [
+    { as: 'tabo', record: seed.records.find((r) => r.library === 'tabo')!.id, set: ['condition=damaged', 'photographed=true'], note: 'Water stain on the last twelve folios after the spring leak.' },
+    { as: 'kye', record: seed.records.find((r) => r.library === 'hemis')!.id, set: [], note: 'Kye holds a second copy of this text; worth comparing.' },
+  ]
+  for (const k of corrections) {
+    // each library is checked on its own feed, so a run that stopped between the two resumes cleanly
+    const lib = c.config.libraries.find((l) => l.id === k.as)!
+    if ((await readStore.latestIndex(lib.address!, anchor.correctionsTopicHex)) !== null) say(`${lib.name}: already posted`)
+    else await correctionSubmit(c, k)
   }
 
-  act(`5. Keep the storage alive: extend the existing batch by ${args['extend-days']} day(s)`)
+  act(`5. Keep the storage alive: extend the existing batch by ${extendDays} day(s)`)
   if (readLedger().some((e) => e.action === 'extend' || e.action === 'topup')) say('already extended once (see STORAGE_LOG.md)')
   else await storageExtend(fresh(), { days: extendDays, yes: true })
 
-  act('6. Ngawang goes quiet. The committees move to hand over to Padma.')
+  act(`6. ${first.name} goes quiet. The committees move to hand over to ${incoming.name}.`)
   c = fresh()
   const reg = await readRegistry(readStore, anchor)
-  if (!sameAddress(reg.current?.entry?.steward.address, ngawang.address)) say('already handed over')
+  if (!sameAddress(reg.current?.entry?.steward.address, first.address)) say('already handed over')
   else {
-    const { path } = await propose(c, { incoming: padma.address!, next: stanzin.address!, trigger: 'T2-silence' })
-    await accept({ proposal: path, as: 'steward-padma' })
+    const { path, proposal } = await propose(c, { incoming: incoming.address!, next: next.address!, trigger: 'T2-silence' })
+    const charter = charterFromConfig(c.config)
+    const needed = requiredThreshold(charter, reg.current?.entry ?? null, proposal.fields.incoming.address)
+    await accept({ proposal: path, as: incoming.keyName })
 
     // Refusal A: the outgoing steward tries to seal on a library's behalf.
     let p = loadProposal(path)
-    const ngKey = loadIdentity(ngawang.keyName, ngawang.name)
-    const charter = charterFromConfig(c.config)
-    const forged = { ...p, approvals: [{ library: 'hemis' as const, address: charter.members.find((m) => m.id === 'hemis')!.address, signature: await signText(ngKey.wallet, p.statement) }] }
+    const outgoingKey = loadIdentity(first.keyName, first.name)
+    const forged = { ...p, approvals: [{ library: 'hemis' as const, address: charter.members.find((m) => m.id === 'hemis')!.address, signature: await signText(outgoingKey.wallet, p.statement) }] }
     try {
-      await performHandoff({ store: new BeeFeedStore(c.bee, c.config.payer.batchId), anchor, charter, proposal: forged, incoming: padma.address!, scribe: loadIdentity(c.config.council.scribe.keyName, 'Council scribe'), now: new Date() })
+      await performHandoff({ store: new BeeFeedStore(c.bee, c.config.payer.batchId), anchor, charter, proposal: forged, incoming: incoming.address!, scribe: loadIdentity(c.config.council.scribe.keyName, 'Council scribe'), now: new Date() })
       throw new Error('forged hand-off was accepted: this must never happen')
     } catch (e) {
       if (!(e instanceof QuorumRejected)) throw e
@@ -172,26 +197,30 @@ async function live() {
       say(`refused as expected: ${e.message}`)
     }
 
-    // Refusal B: three seals only.
-    for (const lib of ['hemis', 'alchi', 'tabo']) await signWithKey({ proposal: path, as: lib })
-    await handoff(fresh(), { proposal: path, incoming: padma.address!, attempt: 'Three of seven libraries seal the hand-off' })
+    // Refusal B: one seal short.
+    const sealers = ['hemis', 'alchi', 'tabo', 'kye', 'diskit'].slice(0, needed)
+    for (const lib of sealers.slice(0, -1)) await signWithKey({ proposal: path, as: lib })
+    await handoff(fresh(), { proposal: path, incoming: incoming.address!, attempt: `${needed - 1} of 7 libraries seal the hand-off` })
 
-    // The fourth seal: now it goes through.
-    await signWithKey({ proposal: path, as: 'kye' })
+    // The last seal: now it goes through.
+    await signWithKey({ proposal: path, as: sealers.at(-1)! })
     await handoff(fresh(), {
       proposal: path,
-      incoming: padma.address!,
+      incoming: incoming.address!,
       notes: [
         'Trigger T2 (silence) was declared by the sealing committees for this demonstration; the 60-day clock itself is exercised in the rehearsal and tests, not waited out in real time.',
-        "Ngawang's key was not used in this hand-off. His earlier signed acceptance (epoch 0) named Padma, which is why four seals suffice.",
+        needed === charter.threshold
+          ? `${first.name}'s key was not used in this hand-off. The acceptance ${first.name} signed at epoch 0 named ${incoming.name}, which is why ${needed} seals suffice.`
+          : `${first.name}'s key was not used in this hand-off. ${incoming.name} was not the successor ${first.name} named, so ${needed} seals were required.`,
       ],
     })
   }
 
-  act('7. Padma publishes on her own feed, folding in the corrections')
+  act(`7. ${incoming.name} publishes on their own feed, folding in the corrections`)
   c = fresh()
-  if ((await readStore.latestIndex(padma.address!, anchor.catalogueTopicHex)) !== null) say('already published')
-  else await cataloguePublish(c, { as: 'steward-padma' })
+  await recoverInterrupted(c)
+  if ((await readStore.latestIndex(incoming.address!, anchor.catalogueTopicHex)) !== null) say('already published')
+  else await cataloguePublish(c, { as: incoming.keyName })
 
   act('8. Read it back with no keys at all')
   await read({ bee: args.bee })
@@ -205,7 +234,7 @@ async function live() {
 
 const run = args.live ? live : args.rehearse ? rehearseAll : null
 if (!run) {
-  console.log('usage: npm run ceremony -- --rehearse | --live --yes [--extend-days 1] [--bee url]')
+  console.log('usage: npm run ceremony -- --rehearse | --live --yes [--incoming steward-padma|0x…] [--next steward-stanzin] [--first steward-ngawang] [--extend-days 1] [--bee url]')
   process.exitCode = 2
 } else {
   run().catch((e: Error) => {

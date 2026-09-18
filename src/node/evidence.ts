@@ -1,11 +1,12 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { join } from 'node:path'
 import { prettyJson } from '../core/canonical.js'
+import type { SocProof } from '../core/feedstore.js'
 import type { HandoffOutcome } from '../core/operations.js'
 import { HandoffProposal, type RejectedAttempt } from '../core/schemas.js'
 import { recoverSigner } from '../core/signatures.js'
 import type { RoleAddress } from './identities.js'
-import { PATHS, ROOT } from './paths.js'
+import { PATHS, repoPath } from './paths.js'
 
 export const SOLO_NOTE =
   'Honest note: this hand-off was performed by a single person. All signing keys (seven library committees, three stewards, the council scribe) were generated on one machine for the demonstration and live in its git-ignored .secrets/ folder. In real use each library committee and each steward generates their own key on their own device and shares only the address. The storage is also not separated: every postage batch belongs to the one shared Bee node.'
@@ -23,7 +24,13 @@ export interface HandoffRecord {
   kind: 'genesis' | 'handoff'
   trigger: string
   statement: string
-  outgoing: { address: string; name: string; lastCatalogueFeedIndex: number | null } | null
+  outgoing: {
+    address: string
+    name: string
+    lastCatalogueFeedIndex: number | null
+    /** the outgoing steward's own signed chunk for their last catalogue update: their key, not the incoming one */
+    lastCatalogueSoc: { socAddress: string; owner: string; signature: string } | null
+  } | null
   incoming: { address: string; name: string; acceptanceSignature: string; suppliedAs: string }
   nextDesignated: { address: string; name: string } | null
   approvals: { library: string; address: string; signature: string; recovered: string | null; valid: boolean }[]
@@ -40,7 +47,18 @@ export interface HandoffRecord {
   catalogueManifestForIncoming: string
   identitiesSeparated: RoleAddress[]
   rejectedAttempts: RejectedAttempt[]
-  successorFirstPublication: { feedIndex: number; catalogueReference: string; version: number; applied: number; proposed: number; at: string } | null
+  successorFirstPublication: {
+    feedIndex: number
+    catalogueReference: string
+    version: number
+    applied: number
+    proposed: number
+    at: string
+    /** the incoming steward's signed chunk for that update */
+    socAddress: string
+    socOwner: string | null
+    socSignature: string | null
+  } | null
   verify: { cli: string; curl: string[] }
 }
 
@@ -52,7 +70,7 @@ export function saveProposal(p: HandoffProposal, path = proposalPath(p.fields.ep
   mkdirSync(PATHS.proposals, { recursive: true })
   writeFileSync(path, prettyJson(HandoffProposal.parse(p)))
   writeFileSync(path.replace(/\.json$/, '.statement.txt'), p.statement + '\n')
-  return relative(ROOT, path)
+  return repoPath(path)
 }
 
 export function loadProposal(path: string): HandoffProposal {
@@ -73,6 +91,7 @@ export function recordFor(
     registryTopicHex: string
     roles: RoleAddress[]
     outgoingLastIndex: number | null
+    outgoingLastSoc?: SocProof | null
     incomingSuppliedAs: string
     notes?: string[]
     now: Date
@@ -98,7 +117,15 @@ export function recordFor(
     kind: outcome.entry.kind,
     trigger: f.trigger,
     statement: proposal.statement,
-    outgoing: f.outgoing ? { ...f.outgoing, lastCatalogueFeedIndex: ctx.outgoingLastIndex } : null,
+    outgoing: f.outgoing
+      ? {
+          ...f.outgoing,
+          lastCatalogueFeedIndex: ctx.outgoingLastIndex,
+          lastCatalogueSoc: ctx.outgoingLastSoc
+            ? { socAddress: ctx.outgoingLastSoc.socAddress, owner: ctx.outgoingLastSoc.owner, signature: ctx.outgoingLastSoc.signature }
+            : null,
+        }
+      : null,
     incoming: {
       address: f.incoming.address,
       name: f.incoming.name,
@@ -142,7 +169,7 @@ export function writeHandoffRecord(record: HandoffRecord): string {
   record.verify.cli = `npm run verify:handoff -- handoffs/${name}`
   writeFileSync(path, JSON.stringify(record, null, 2) + '\n')
   appendHandoffLog(record, name)
-  return relative(ROOT, path)
+  return repoPath(path)
 }
 
 export function listHandoffRecords(): { path: string; record: HandoffRecord }[] {
@@ -164,9 +191,10 @@ export function noteSuccessorPublication(stewardAddress: string, pub: NonNullabl
   appendFileSync(
     PATHS.handoffLog,
     `\n> Epoch ${match.record.epoch} follow-up, ${pub.at}: ${match.record.incoming.name} published catalogue v${pub.version} ` +
-      `on their own feed (update #${pub.feedIndex}, \`${pub.catalogueReference}\`), applying ${pub.applied} library correction(s) and keeping ${pub.proposed} as proposals.\n`,
+      `on their own feed (update #${pub.feedIndex}, collection \`${pub.catalogueReference}\`, signed chunk \`${pub.socAddress}\` ` +
+      `owned by \`${pub.socOwner ?? 'not read back'}\`, the incoming key), applying ${pub.applied} library correction(s) and keeping ${pub.proposed} as proposals.\n`,
   )
-  return relative(ROOT, match.path)
+  return repoPath(match.path)
 }
 
 function appendHandoffLog(r: HandoffRecord, file: string): void {
@@ -178,6 +206,9 @@ function appendHandoffLog(r: HandoffRecord, file: string): void {
     `- **When:** ${r.performedAt}`,
     `- **Trigger:** ${r.trigger}`,
     `- **Outgoing steward key:** ${r.outgoing ? `\`${r.outgoing.address}\` (${r.outgoing.name})` : 'none (genesis)'}`,
+    ...(r.outgoing?.lastCatalogueSoc
+      ? [`- **Outgoing steward's last signed catalogue update:** feed index #${r.outgoing.lastCatalogueFeedIndex}, chunk \`${r.outgoing.lastCatalogueSoc.socAddress}\`, signed by \`${r.outgoing.lastCatalogueSoc.owner}\` (the outgoing key)`]
+      : []),
     `- **Incoming steward key:** \`${r.incoming.address}\` (${r.incoming.name}), passed to the hand-off command as \`${r.incoming.suppliedAs}\``,
     `- **Next designated successor:** ${r.nextDesignated ? `\`${r.nextDesignated.address}\` (${r.nextDesignated.name})` : 'none named'}`,
     `- **Seals:** ${r.threshold}`,

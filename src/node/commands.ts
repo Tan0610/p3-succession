@@ -1,8 +1,8 @@
 import { existsSync, writeFileSync } from 'node:fs'
-import { relative, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import { BZZ, type Bee } from '@ethersphere/bee-js'
 import { stats } from '../core/catalogue.js'
-import type { Identity } from '../core/feedstore.js'
+import type { Identity, SocProof } from '../core/feedstore.js'
 import {
   addAcceptance,
   addSeal,
@@ -18,7 +18,7 @@ import {
 import { readRegistry, resolveAll, defaultAnchor, type Anchor, type CatalogueView } from '../core/resolve.js'
 import { CorrectionChanges, LibraryId, TriggerId, type Condition, type HandoffProposal } from '../core/schemas.js'
 import { recoverSigner, verifyQuorum, requiredThreshold } from '../core/signatures.js'
-import { sameAddress, shortHex } from '../core/swarm.js'
+import { feedUpdateAddress, sameAddress, shortHex } from '../core/swarm.js'
 import { evaluateTriggers } from '../core/triggers.js'
 import { BeeFeedStore, makeBee } from './bee.js'
 import {
@@ -33,10 +33,10 @@ import {
   syncDocs,
   type StewardshipConfig,
 } from './config.js'
-import { loadProposal, noteSuccessorPublication, proposalPath, recordFor, saveProposal, writeHandoffRecord } from './evidence.js'
+import { listHandoffRecords, loadProposal, noteSuccessorPublication, proposalPath, recordFor, saveProposal, writeHandoffRecord } from './evidence.js'
 import { assertIdentitiesSeparated } from './identities.js'
 import { hasKey, loadIdentity, newKey } from './keys.js'
-import { PATHS, ROOT } from './paths.js'
+import { PATHS, repoPath, ROOT } from './paths.js'
 import {
   buyBatch,
   extendBatch,
@@ -233,9 +233,12 @@ export async function cataloguePublish(c: Ctx, opts: { as: string; summary?: str
     `  ${st.total} works, ${st.byCondition.damaged} damaged, ${st.byCondition.missing} missing; ${result.applied} correction(s) applied, ${result.proposed} proposed`,
     result.inheritedFrom ? `  (picked up from predecessor ${personName(c.config, result.inheritedFrom)})` : '',
   )
+  // the signed chunk of this update, read back: proof the NEW steward's key signed it
+  const proof = await store.socProof(steward.address, requireAnchor(c.config).catalogueTopicHex, BigInt(result.feedIndex)).catch(() => null)
   const noted = noteSuccessorPublication(steward.address, {
     feedIndex: result.feedIndex, catalogueReference: result.reference, version: result.catalogue.version,
     applied: result.applied, proposed: result.proposed, at: result.catalogue.publishedAt,
+    socAddress: result.socAddress, socOwner: proof?.owner ?? null, socSignature: proof?.signature ?? null,
   })
   if (noted) out(`  recorded as the successor's first publication in ${noted}`)
   return result
@@ -396,30 +399,63 @@ export async function handoff(
     if (e instanceof QuorumRejected) {
       proposal.rejectedAttempts.push({ at: now.toISOString(), attempt: opts.attempt ?? `hand-off with ${proposal.approvals.length} seal(s)`, result: e.message })
       saveProposal(proposal, opts.proposal)
-      out(`REFUSED and recorded in ${relative(ROOT, opts.proposal)}: ${e.message}`)
+      out(`REFUSED and recorded in ${repoPath(opts.proposal)}: ${e.message}`)
       return null
     }
     throw e
   }
 
+  const outgoingProof =
+    outgoingAddr && outgoingLast !== null ? await store.socProof(outgoingAddr, anchor.catalogueTopicHex, outgoingLast).catch(() => null) : null
+  return finishHandoff(c, {
+    outcome, proposal, payer, roles, now, outgoingLast, outgoingProof,
+    incomingSuppliedAs: `--incoming ${opts.incoming}`, ...(opts.notes ? { notes: opts.notes } : {}),
+  })
+}
+
+/**
+ * Everything after the registry update is on the network: the evidence file,
+ * HANDOFF_LOG.md, the config and the documents. Shared by a normal hand-off and
+ * by recovery after an interrupted run, so both leave identical records.
+ */
+async function finishHandoff(
+  c: Ctx,
+  x: {
+    outcome: HandoffOutcome
+    proposal: HandoffProposal
+    payer: string
+    roles: ReturnType<typeof assertIdentitiesSeparated>
+    now: Date
+    outgoingLast: bigint | null
+    outgoingProof: SocProof | null
+    incomingSuppliedAs: string
+    notes?: string[]
+  },
+): Promise<HandoffOutcome> {
+  const { outcome, now } = x
+  const anchor = requireAnchor(c.config)
+  const scribe = c.config.council.scribe.address!
   // first entry: create the stable registry manifest readers can bookmark forever
   // (a failure here must not stop the evidence being written: it is retried on the next hand-off)
-  if (!c.config.registryManifest) c.config.registryManifest = await store.createFeedManifest(anchor.registryTopicHex, scribe.address).catch(() => null)
+  if (!c.config.registryManifest) {
+    c.config.registryManifest = await writeStore(c).createFeedManifest(anchor.registryTopicHex, scribe).catch(() => null)
+  }
   const status = await storageStatus(c.bee, requireBatch(c)).catch(() => null)
   const versions = await c.bee.status.getHealth().catch(() => null)
   const record = recordFor(outcome, {
-    proposal, beeUrl: c.url, beeVersion: versions?.version ?? null, apiVersion: versions?.apiVersion ?? null,
-    payer, batchId: requireBatch(c), ttlDays: status?.ttlDays ?? null, registryManifest: c.config.registryManifest,
-    registryTopicHex: anchor.registryTopicHex, roles, outgoingLastIndex: outgoingLast === null ? null : Number(outgoingLast),
-    incomingSuppliedAs: `--incoming ${opts.incoming}`, now, ...(opts.notes ? { notes: opts.notes } : {}),
+    proposal: x.proposal, beeUrl: c.url, beeVersion: versions?.version ?? null, apiVersion: versions?.apiVersion ?? null,
+    payer: x.payer, batchId: requireBatch(c), ttlDays: status?.ttlDays ?? null, registryManifest: c.config.registryManifest,
+    registryTopicHex: anchor.registryTopicHex, roles: x.roles, outgoingLastIndex: x.outgoingLast === null ? null : Number(x.outgoingLast),
+    outgoingLastSoc: x.outgoingProof, incomingSuppliedAs: x.incomingSuppliedAs, now, ...(x.notes ? { notes: x.notes } : {}),
   })
   const file = writeHandoffRecord(record)
 
   c.config.status = 'live'
-  c.config.payer.nodeAddress = payer
+  c.config.payer.nodeAddress = x.payer
   c.config.currentSteward = outcome.entry.steward.address
   c.config.designatedSuccessor = outcome.entry.designatedSuccessor?.address ?? null
   c.config.catalogueManifests[outcome.entry.steward.address] = outcome.catalogueManifest
+  c.config.history = c.config.history.filter((h) => h.epoch !== outcome.entry.epoch)
   c.config.history.push({
     epoch: outcome.entry.epoch, steward: outcome.entry.steward.address, stewardName: outcome.entry.steward.name,
     registryFeedIndex: outcome.feedIndex, entryReference: outcome.entryReference, record: file, at: now.toISOString(),
@@ -430,10 +466,51 @@ export async function handoff(
     `Hand-off done. Epoch ${outcome.entry.epoch}: readers now follow ${outcome.entry.steward.name} (${outcome.entry.steward.address}).`,
     `  seals        ${outcome.quorum.counted.length}/${outcome.quorum.threshold}: ${outcome.quorum.counted.map((x) => x.library).join(', ')}`,
     `  registry     update #${outcome.feedIndex}, entry ${outcome.entryReference}`,
-    `  signed chunk ${outcome.socAddress} by scribe ${outcome.proof?.owner ?? scribe.address}`,
+    `  signed chunk ${outcome.socAddress} by scribe ${outcome.proof?.owner ?? scribe}`,
     `  evidence     ${file} and HANDOFF_LOG.md`,
   )
   return outcome
+}
+
+/**
+ * Resuming an interrupted ceremony: if the registry on the network holds a
+ * valid hand-off that has no evidence file here (the run stopped right after
+ * the scribe wrote it), rebuild the record from the network itself. Nothing is
+ * written to Swarm; everything comes from the signed entry and its chunk.
+ */
+export async function recoverHandoffRecords(c: Ctx): Promise<string[]> {
+  const anchor = requireAnchor(c.config)
+  const store = new BeeFeedStore(c.bee, null)
+  const registry = await readRegistry(store, anchor)
+  const recorded = new Set(listHandoffRecords().map((r) => r.record.epoch))
+  const recovered: string[] = []
+  for (const [i, v] of registry.valid.entries()) {
+    const e = v.entry
+    if (!e || !v.quorum || recorded.has(e.epoch)) continue
+    const local = existsSync(proposalPath(e.epoch)) ? loadProposal(proposalPath(e.epoch)) : null
+    const proposal: HandoffProposal =
+      local && local.statement === e.statement
+        ? { ...local, approvals: e.approvals, acceptance: e.acceptance }
+        : { schema: 'lsc/handoff-proposal@1', catalogueId: e.catalogueId, fields: e.fields, statement: e.statement, approvals: e.approvals, acceptance: e.acceptance, rejectedAttempts: [], createdAt: e.issuedAt }
+    const idx = BigInt(v.feedIndex)
+    const proof = await store.socProof(anchor.registryOwner, anchor.registryTopicHex, idx).catch(() => null)
+    const outgoing = registry.valid[i - 1]?.entry?.steward.address ?? null
+    const outgoingLast = outgoing ? await store.latestIndex(outgoing, anchor.catalogueTopicHex).catch(() => null) : null
+    const outgoingProof = outgoing && outgoingLast !== null ? await store.socProof(outgoing, anchor.catalogueTopicHex, outgoingLast).catch(() => null) : null
+    const payer = await payerAddress(c.bee)
+    await finishHandoff(c, {
+      outcome: {
+        entry: e, entryReference: v.reference, feedIndex: v.feedIndex, socAddress: feedUpdateAddress(anchor.registryOwner, anchor.registryTopicHex, idx),
+        proof, readBack: { feedIndex: v.feedIndex, entryReference: v.reference, match: true }, quorum: v.quorum,
+        catalogueManifest: e.catalogueManifest ?? '', readerNowFollows: registry.current?.entry?.steward.address ?? null,
+      },
+      proposal, payer, roles: assertIdentitiesSeparated(c.config, payer), now: new Date(e.issuedAt), outgoingLast, outgoingProof,
+      incomingSuppliedAs: `--incoming ${e.steward.address}`,
+      notes: ['This record was rebuilt from the registry entry on the network after the ceremony was interrupted between writing the registry and writing this file. Every signature and index in it was read back from Swarm.'],
+    })
+    recovered.push(`epoch ${e.epoch}`)
+  }
+  return recovered
 }
 
 export async function checkTrigger(c: Ctx, opts: { unanswered?: number; declared?: boolean; removalVotes?: number }) {
@@ -455,7 +532,7 @@ export function writeJson(path: string, value: unknown) {
 
 export function proposalFor(epoch: number): string {
   const path = proposalPath(epoch)
-  if (!existsSync(path)) throw new Error(`No proposal for epoch ${epoch} at ${relative(ROOT, path)}`)
+  if (!existsSync(path)) throw new Error(`No proposal for epoch ${epoch} at ${repoPath(path)}`)
   return path
 }
 
