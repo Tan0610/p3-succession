@@ -26,7 +26,8 @@ export class HttpFeedStore implements FeedReadStore {
 
   async latestIndex(owner: string, topicHex: string): Promise<bigint | null> {
     const res = await this.fetcher(`${this.base}/feeds/${stripHex(owner)}/${stripHex(topicHex)}?Swarm-Only-Root-Chunk=true`)
-    if (res.status === 404) return null
+    // 404 means "no updates" or "lookup failed"; the chunks themselves settle which
+    if (res.status === 404) return this.probeLatest(owner, topicHex)
     const header = res.ok ? res.headers.get('swarm-feed-index') : null
     if (header) return BigInt(`0x${header}`)
     // Public gateways don't expose the index header to browsers (CORS), so find
