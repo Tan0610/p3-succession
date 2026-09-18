@@ -4,6 +4,16 @@
 
 *A plain-language agreement between the seven library committees of Diskit, Thiksey, Hemis, Alchi and Lamayuru in Ladakh, and Kye and Tabo in Spiti.*
 
+> **In one minute**
+>
+> - Everyone finds the catalogue through **one register whose address never changes**. The register says who the steward is today.
+> - **No single person can change the steward.** It takes the seals of **4 of the 7 libraries** (5 if the new person is not the one the old steward named), and the new steward must sign too.
+> - **Each library can correct its own shelves itself**, at any time, without writing to the steward.
+> - **Anyone can pay to keep the storage alive.** Nobody has to ask permission to add rent.
+> - **The next steward is already named** (§3), and §4 says exactly when they may take over.
+>
+> **About this copy.** This is a working demonstration, prepared by one person. All eleven keys (the seven library committees, three stewards and the council scribe) were made on that one person's computer. In real use, each committee and each steward makes its own key on its own device and only ever shares the public address. See §8.
+
 ---
 
 ## 1. What we share
@@ -13,6 +23,13 @@ Together we keep one catalogue: what each library holds, the condition of every 
 For nine years one person, Ngawang Dorje, kept it for all of us. He paid for the storage, held the only key that could publish it, and typed in every correction we sent him. This agreement exists so that the catalogue does not depend on any one person, including whoever comes after him.
 
 The catalogue lives on **Swarm**, a storage network with no single company or server behind it. Anyone can read it. Only the people named below can change it, and only in the ways described below.
+
+A few words used below:
+
+- **Key**: a secret, like a personal seal-stamp kept in a drawer. It comes with a public **address** (a long code starting `0x`) that anyone may see. Signing with the key proves the signer holds it. The key itself is never written down in this document or in any shared file.
+- **Seal**: a library committee signing a statement with its key. Anyone can check a seal against the committee's address.
+- **Register**: a short list, kept on Swarm, of who has been steward and who the libraries sealed.
+- **Rent** (a "postage batch"): storage on Swarm is paid in advance for a length of time. When the rent runs out, the stored catalogue can disappear.
 
 ## 2. The four roles, and what each one cannot do
 
@@ -58,7 +75,9 @@ Every steward, when they accept the role, names the person they would like to fo
 **When the successor takes over:** when any trigger in §4 is met (T1 they step down; T2 no catalogue update for 60 days and two libraries unanswered for 30; T3 under 30 days of storage left; T4 five of the seven libraries ask for removal), with 4 of the 7 library seals.
 <!-- /lsc:successor -->
 
-Handing over to the designated successor needs **4 of the 7 seals**. Handing over to anyone else needs **5 of the 7**, because it overrides the outgoing steward's own wish.
+Why the difference between 4 and 5 seals: choosing the person the outgoing steward named respects their wish, so a simple majority of libraries is enough. Choosing someone else overrides that wish, so it needs a larger majority.
+
+The block above is filled in by the software from `stewardship.config.json`, so the names and keys here always match what the register on Swarm says.
 
 ## 4. When a hand-off may begin
 
@@ -105,8 +124,13 @@ Swarm storage is **rent paid in advance, not a purchase**. A postage batch lasts
 
 We would rather say this plainly than have you discover it later.
 
-- **Storage custody is not separated.** At present all storage runs on **one shared Bee node**, and every postage batch belongs to that node's wallet. Whoever controls that machine controls whether new uploads can be stamped. Other people can *add rent*, but cannot stamp uploads or take over the batch. A future step is for a second library to run its own node and hold its own batch as a mirror.
-- **All the keys were made on one machine for this demonstration.** In real use, each library committee and each steward generates their own key on their own device and shares only the public address.
+- **Storage custody is not separated.** At present all storage runs on **one shared Bee node** (one computer running the Swarm software), and every postage batch belongs to that node's wallet. In practice this means:
+  - whoever looks after that computer decides whether *new* versions can be uploaded at all;
+  - anyone else can *add rent* to keep what is already stored alive, but cannot upload with it or take the batch over;
+  - if that computer is switched off for good, the catalogue already on Swarm stays readable until its rent runs out, and the steward's and libraries' keys still work, but a new node with its own batch is needed before anything new can be published.
+
+  The fix is for a second library to run its own node and hold its own batch as a mirror. Until then, this is the one part of the arrangement that still depends on one machine.
+- **All the keys were made on one machine for this demonstration.** One person played every part: the seven committees, the three stewards and the scribe. The hand-off records say so. In real use, each library committee and each steward generates their own key on their own device and shares only the public address. A key made on someone else's computer should never be trusted as your own.
 - **Losing the scribe key** would freeze the register: no new steward could be recorded, although the catalogue stays readable. The council secretary keeps the key, with sealed copies at two libraries. A later version may let several libraries each keep a mirror register.
 - **Storage that has fully expired cannot be revived.** It can only be uploaded again from a copy. Top up before it runs out.
 - **Everything published is public.** Do not put anything in the catalogue that should not be seen by anyone, forever.
