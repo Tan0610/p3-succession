@@ -127,6 +127,12 @@ async function live() {
     await assertCanPay(c, await quoteExtend(c.bee, status.batchId, extendDays), 'Stopping before anything is written.')
   }
   say(`Batch usable, ${status.ttlDays} days paid, ${status.usageText} used. Wallet can cover the extension.`)
+  const cheques = await c.bee.chequebook.getBalance().catch(() => null)
+  if (cheques && cheques.availableBalance.toPLURBigInt() === 0n) {
+    // Not fatal: a few hundred chunks usually fit in the peers' free allowance.
+    say('note: the chequebook is empty, so uploads rely on peers\' free bandwidth allowance. If an upload fails with')
+    say('      "insufficient funds" or "overdraft", deposit a little xBZZ (e.g. 0.1) into the chequebook and re-run: it resumes.')
+  }
 
   act('1. Keys (private halves stay in .secrets/, git-ignored)')
   keysInit()
