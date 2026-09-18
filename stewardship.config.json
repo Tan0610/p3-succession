@@ -1,0 +1,111 @@
+{
+  "bee": {
+    "url": "http://localhost:1633"
+  },
+  "catalogueId": "ladakh-spiti-manuscripts",
+  "catalogueManifests": {},
+  "council": {
+    "scribe": {
+      "address": null,
+      "keyName": "council-scribe",
+      "name": "Council scribe"
+    }
+  },
+  "currentSteward": null,
+  "designatedSuccessor": null,
+  "history": [],
+  "libraries": [
+    {
+      "address": null,
+      "id": "diskit",
+      "keyName": "library-diskit",
+      "name": "Diskit library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "address": null,
+      "id": "thiksey",
+      "keyName": "library-thiksey",
+      "name": "Thiksey library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "address": null,
+      "id": "hemis",
+      "keyName": "library-hemis",
+      "name": "Hemis library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "address": null,
+      "id": "alchi",
+      "keyName": "library-alchi",
+      "name": "Alchi library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "address": null,
+      "id": "lamayuru",
+      "keyName": "library-lamayuru",
+      "name": "Lamayuru library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "address": null,
+      "id": "kye",
+      "keyName": "library-kye",
+      "name": "Kye library committee",
+      "valley": "Spiti"
+    },
+    {
+      "address": null,
+      "id": "tabo",
+      "keyName": "library-tabo",
+      "name": "Tabo library committee",
+      "valley": "Spiti"
+    }
+  ],
+  "payer": {
+    "batchId": null,
+    "batchLabel": "lsc-catalogue",
+    "nodeAddress": null,
+    "role": "The Bee node wallet. It owns every postage batch on this shared node and pays for storage. It never signs catalogue or registry updates."
+  },
+  "registryManifest": null,
+  "schema": "lsc/config@1",
+  "status": "awaiting-live-ceremony",
+  "stewards": [
+    {
+      "address": null,
+      "keyName": "steward-ngawang",
+      "library": "hemis",
+      "name": "Ngawang Dorje"
+    },
+    {
+      "address": null,
+      "keyName": "steward-padma",
+      "library": "tabo",
+      "name": "Padma Chodon"
+    },
+    {
+      "address": null,
+      "keyName": "steward-stanzin",
+      "library": "thiksey",
+      "name": "Stanzin Namgyal"
+    }
+  ],
+  "topics": {
+    "catalogue": {
+      "hex": "5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f",
+      "string": "lsc/catalogue/v1"
+    },
+    "corrections": {
+      "hex": "2cf9be53bb7408cee80ea7678ddcb7700e4ae3167670105625954316124ee633",
+      "string": "lsc/corrections/v1"
+    },
+    "registry": {
+      "hex": "f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46967eb51c77a4b88a6d",
+      "string": "lsc/registry/v1"
+    }
+  }
+}
