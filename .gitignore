@@ -1,0 +1,21 @@
+# --- secrets: NEVER tracked -------------------------------------------------
+.secrets/
+*.key
+*.pem
+.env
+.env.*
+!.env.example
+
+# --- rehearsals (in-memory dry runs, not evidence) --------------------------
+handoffs/rehearsals/
+
+# --- build / tooling --------------------------------------------------------
+node_modules/
+dist/
+web/dist/
+.build/
+coverage/
+*.log
+.vite/
+.DS_Store
+Thumbs.db
