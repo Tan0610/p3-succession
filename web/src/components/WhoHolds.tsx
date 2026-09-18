@@ -66,20 +66,36 @@ export function WhoHolds({ people, steward }: { people: People; steward: string 
                 <th scope="row">
                   {r.role}
                   {holder && (
-                    <div style={{ fontWeight: 400, fontSize: '0.85rem', marginTop: '0.2rem' }}>
+                    <div className="holder">
                       <Hex value={holder} />
                     </div>
                   )}
                 </th>
-                <td className={r.pays ? 'yes' : 'no'}>{r.pays ? 'yes' : 'no'}</td>
-                <td className={r.publishes ? 'yes' : 'no'}>{r.publishes ? 'yes, on its own feed' : 'no'}</td>
-                <td className={r.decides.startsWith('yes') ? 'yes' : 'no'}>{r.decides}</td>
-                <td>{r.cannot}</td>
+                <Mark label="Pays for storage" yes={r.pays} text={r.pays ? 'yes' : 'no'} />
+                <Mark label="Publishes" yes={r.publishes} text={r.publishes ? 'yes, on its own feed' : 'no'} />
+                <Mark label="Decides who publishes" yes={r.decides.startsWith('yes')} text={r.decides} />
+                <td data-label="Cannot" className="cannot">
+                  <span>{r.cannot}</span>
+                </td>
               </tr>
             )
           })}
         </tbody>
       </table>
     </div>
+  )
+}
+
+/** A tick or a cross, drawn as if a committee member marked it by hand. */
+function Mark({ label, yes, text }: { label: string; yes: boolean; text: string }) {
+  return (
+    <td data-label={label} className={yes ? 'yes' : 'no'}>
+      <span>
+        <span className="mark" aria-hidden="true">
+          {yes ? '✓' : '✗'}
+        </span>
+        {text}
+      </span>
+    </td>
   )
 }
