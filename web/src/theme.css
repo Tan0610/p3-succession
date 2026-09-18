@@ -848,7 +848,7 @@ section.chapter {
   display: grid;
   grid-template-columns: minmax(12rem, 18rem) minmax(0, 1fr);
   gap: clamp(1.5rem, 5vw, 4rem);
-  align-items: end;
+  align-items: center;
 }
 @media (max-width: 720px) {
   .lamp-wrap {
@@ -1012,4 +1012,53 @@ footer {
   font-family: var(--hand);
   font-size: 1.3rem;
   padding: 3rem 0;
+}
+
+/* ── narrow screens ───────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero,
+  .ceremony,
+  .map-wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 720px) {
+  .lamp-wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lamp {
+    max-width: 12rem;
+  }
+  .seal-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    row-gap: 0.9rem;
+  }
+  .plaque {
+    transform: none;
+  }
+  .plaque dl {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+  }
+  .plaque dd {
+    margin-bottom: 0.5rem;
+  }
+  .keeper:nth-child(even) {
+    margin-left: 0.6rem;
+  }
+  .keeper.now .who::after {
+    display: block;
+    margin-left: 0;
+  }
+  .holds tbody th {
+    width: auto;
+  }
+}
+
+@media (min-width: 901px) {
+  /* keep the seal row in view while the story scrolls past */
+  .ceremony > div:first-child {
+    position: sticky;
+    top: 6rem;
+  }
 }
