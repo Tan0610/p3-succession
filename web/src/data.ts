@@ -73,7 +73,7 @@ export interface StorageInfo {
   batchId: string
   label: string
   /** 'node' = read live from the node now; 'recorded' = last value in the ledger */
-  basis: 'node' | 'recorded'
+  basis: 'node' | 'recorded' | 'rehearsal'
 }
 
 export interface Snapshot {
@@ -181,7 +181,7 @@ export class Rehearsal {
       label: 'a rehearsal running in your browser',
       view,
       people: this.people(),
-      storage: { ttlDays: 21, expiresAt: new Date(Date.now() + 21 * 86_400_000).toISOString(), batchId: '0'.repeat(64), label: 'rehearsal', basis: 'recorded' },
+      storage: { ttlDays: 90, expiresAt: new Date(Date.now() + 90 * 86_400_000).toISOString(), batchId: '0'.repeat(64), label: 'rehearsal', basis: 'rehearsal' },
       rejectedAttempts: refused.map((s) => ({ at: '', attempt: s.title, result: s.detail })),
     }
   }

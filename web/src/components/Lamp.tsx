@@ -53,7 +53,11 @@ export function Lamp({ storage, ledger }: { storage: StorageInfo | null; ledger:
             {days < 1 ? 'Less than a day' : `${Math.floor(days)} days`}
             <small>
               of storage paid for, until about {formatDate(storage.expiresAt)}.{' '}
-              {storage.basis === 'node' ? 'Read from the node just now.' : 'From the last payment in the storage log.'}
+              {storage.basis === 'node'
+                ? 'Read from the node just now.'
+                : storage.basis === 'rehearsal'
+                  ? 'A made-up figure for the rehearsal.'
+                  : 'From the last payment in the storage log.'}
             </small>
           </p>
         ) : (
