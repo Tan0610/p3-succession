@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs'
 import { parseArgs } from 'node:util'
 import { readRegistry, defaultAnchor } from '../src/core/resolve.js'
 import { RegistryEntry } from '../src/core/schemas.js'
-import { recoverSigner, verifyQuorum } from '../src/core/signatures.js'
+import { recoverSigner, requiredThreshold, verifyQuorum } from '../src/core/signatures.js'
 import { sameAddress } from '../src/core/swarm.js'
 import { BeeFeedStore, makeBee } from '../src/node/bee.js'
 import type { HandoffRecord } from '../src/node/evidence.js'
@@ -30,7 +30,8 @@ const check = (ok: boolean, label: string) => {
 }
 
 const main = async () => {
-  check(!sameAddress(record.outgoing?.address, record.incoming.address), 'outgoing and incoming are two distinct signing identities')
+  if (record.outgoing) check(!sameAddress(record.outgoing.address, record.incoming.address), 'outgoing and incoming are two distinct signing identities')
+  else console.log('     genesis: no outgoing steward')
   check(sameAddress(recoverSigner(record.statement, record.incoming.acceptanceSignature), record.incoming.address), 'incoming steward signed the statement')
   for (const a of record.approvals) {
     check(sameAddress(recoverSigner(record.statement, a.signature), a.address), `seal from ${a.library} recovers to ${a.address}`)
@@ -44,10 +45,22 @@ const main = async () => {
   const entry = RegistryEntry.parse(await store.readJson(ref))
   const registry = await readRegistry(store, anchor)
   const charter = registry.genesisCharter ?? entry.charter
-  const q = verifyQuorum(entry.statement, entry.approvals, charter, charter.threshold)
-  check(q.counted.length >= charter.threshold, `entry on the network carries ${q.counted.length} valid seals`)
+  const previous = registry.valid.filter((v) => v.feedIndex < record.registryUpdate.feedIndex).at(-1)?.entry ?? null
+  const needed = requiredThreshold(charter, previous, entry.steward.address)
+  const q = verifyQuorum(entry.statement, entry.approvals, charter, needed)
+  check(q.ok, `entry on the network carries ${q.counted.length} valid seals (${needed} required)`)
   const proof = await store.socProof(record.council.scribe, anchor.registryTopicHex, BigInt(record.registryUpdate.feedIndex))
   check(sameAddress(proof.owner, record.council.scribe), `signed chunk ${proof.socAddress.slice(0, 12)}… is owned by the council scribe`)
+  const soc = record.outgoing?.lastCatalogueSoc
+  if (record.outgoing && soc && record.outgoing.lastCatalogueFeedIndex !== null) {
+    const p = await store.socProof(record.outgoing.address, anchor.catalogueTopicHex, BigInt(record.outgoing.lastCatalogueFeedIndex))
+    check(sameAddress(p.owner, record.outgoing.address) && p.signature === soc.signature, `outgoing steward's catalogue update #${record.outgoing.lastCatalogueFeedIndex} is signed by the outgoing key`)
+  }
+  const pub = record.successorFirstPublication
+  if (pub) {
+    const p = await store.socProof(record.incoming.address, anchor.catalogueTopicHex, BigInt(pub.feedIndex))
+    check(sameAddress(p.owner, record.incoming.address), `incoming steward's catalogue update #${pub.feedIndex} is signed by the incoming key`)
+  }
   check(
     registry.valid.some((v) => v.feedIndex === record.registryUpdate.feedIndex),
     'a keyless reader accepts this entry as valid',
