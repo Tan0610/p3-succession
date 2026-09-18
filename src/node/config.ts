@@ -190,7 +190,7 @@ export function renderIdentitiesBlock(c: StewardshipConfig): string {
 export function renderAnchorBlock(c: StewardshipConfig): string {
   return [
     '```',
-    `registry owner (council scribe) : ${c.council.scribe.address ?? PENDING_REGISTRY}`,
+    `registry owner (council scribe) : ${c.council.scribe.address ?? '(made by keys init at the start of the live ceremony)'}`,
     `registry topic                  : ${c.topics.registry.string}`,
     `registry topic (hex)            : ${c.topics.registry.hex}`,
     `registry feed manifest          : ${c.registryManifest ?? PENDING_REGISTRY}`,
