@@ -72,6 +72,12 @@ describe('the whole story', () => {
     expect(r.finalView.registry.entries.filter((e) => !e.ok)).toHaveLength(1)
     expect(r.finalView.catalogue?.version).toBe(4)
     expect(r.anchor.registryOwner).toBe(cast.scribe.address)
+
+    // what the tools write out never carries a key: no private key, no mnemonic
+    const written = JSON.stringify({ ...r, finalView: undefined }, (_k, v: unknown) => (typeof v === 'bigint' ? v.toString() : v))
+    const everyone = [cast.scribe, cast.ngawang, cast.padma, cast.stanzin, ...Object.values(cast.libraries)]
+    for (const id of everyone) expect(written.toLowerCase()).not.toContain(id.wallet.privateKey.slice(2).toLowerCase())
+    expect(written).not.toMatch(/privateKey|mnemonic|phrase/i)
   })
 })
 

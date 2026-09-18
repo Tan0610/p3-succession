@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs'
-import { Wallet } from 'ethers'
+import { HDNodeWallet, Wallet } from 'ethers'
 import { describe, expect, it } from 'vitest'
 import { buildCharter } from '../src/core/operations.js'
 import { LIBRARY_IDS, type LibraryId } from '../src/core/schemas.js'
 import { evaluateTriggers } from '../src/core/triggers.js'
-import { auditSecrets } from '../src/node/audit.js'
+import { auditSecrets, scanText } from '../src/node/audit.js'
 import {
   loadConfig,
   renderAnchorBlock,
@@ -78,6 +78,34 @@ describe('identities', () => {
 describe('secret audit', () => {
   it('the repository is clean', () => {
     expect(auditSecrets()).toEqual([])
+  })
+
+  // Every key below is made at runtime, so this file never holds one.
+  const kinds = (text: string, roles = new Set<string>()) => scanText('x', text, [], roles).map((h) => h.kind)
+
+  it('flags 32 bytes of hex under any key-like name', () => {
+    const hex = Wallet.createRandom().privateKey
+    expect(kinds(`LSC_KEY_STEWARD_PADMA=${hex}`)).toContain('32-byte hex assigned to a key-like name')
+    expect(kinds(`const pk = "${hex.slice(2)}"`)).toContain('32-byte hex assigned to a key-like name')
+    expect(kinds(`new Wallet('${hex}')`)).toContain('ethers Wallet built from a literal key')
+  })
+
+  it('flags the private key of any role address, whatever it is called', () => {
+    const w = Wallet.createRandom()
+    expect(kinds(`"reference": "${w.privateKey.slice(2)}"`, new Set([w.address.toLowerCase()]))).toContain(
+      'the private key of a role address in stewardship.config.json',
+    )
+  })
+
+  it('flags the well-known Hardhat/Anvil development keys', () => {
+    const phrase = [...Array(11).fill('test'), 'junk'].join(' ')
+    const dev = HDNodeWallet.fromPhrase(phrase, undefined, "m/44'/60'/0'/0/0")
+    expect(kinds(`const fixture = '${dev.privateKey}'`)).toContain('a well-known development private key (Hardhat/Anvil)')
+  })
+
+  it('leaves topic hashes, references and addresses alone', () => {
+    expect(kinds(`"hex": "${'5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f'}"`)).toEqual([])
+    expect(kinds(`registry owner : ${Wallet.createRandom().address}`)).toEqual([])
   })
 })
 
