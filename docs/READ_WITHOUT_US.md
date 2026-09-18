@@ -4,10 +4,10 @@ You need **one address** (the council scribe's) and **any Bee node or gateway**.
 
 <!-- lsc:anchor -->
 ```
-registry owner (council scribe) : (after the live ceremony)
+registry owner (council scribe) : (created by the first live hand-off)
 registry topic                  : lsc/registry/v1
 registry topic (hex)            : f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46967eb51c77a4b88a6d
-registry feed manifest          : (after the live ceremony)
+registry feed manifest          : (created by the first live hand-off)
 catalogue topic                 : lsc/catalogue/v1  (5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f)
 corrections topic               : lsc/corrections/v1  (2cf9be53bb7408cee80ea7678ddcb7700e4ae3167670105625954316124ee633)
 ```

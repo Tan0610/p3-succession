@@ -4,7 +4,7 @@ import { prettyJson } from '../core/canonical.js'
 import { buildCharter, CATALOGUE_ID, LIBRARIES } from '../core/operations.js'
 import { defaultAnchor, type Anchor } from '../core/resolve.js'
 import { Address, LibraryId, Ref, SeedCatalogue, type Charter } from '../core/schemas.js'
-import { shortHex, TOPICS, topicHex } from '../core/swarm.js'
+import { sameAddress, shortHex, TOPICS, topicHex } from '../core/swarm.js'
 import { PATHS } from './paths.js'
 
 /**
@@ -129,37 +129,57 @@ export function personName(config: StewardshipConfig, address: string | null): s
 
 // ── keep the human documents in step with the config ───────────────────────
 
-const PENDING = '_(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_'
+const PENDING_KEY = '_(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_'
+const PENDING_PAYER = '_(no batch yet: `npm run cli -- storage buy` or `storage use` fills this in)_'
+const PENDING_REGISTRY = '(created by the first live hand-off)'
 
 function block(name: string, body: string, text: string): string {
   const re = new RegExp(`(<!-- lsc:${name} -->)[\\s\\S]*?(<!-- /lsc:${name} -->)`)
-  return re.test(text) ? text.replace(re, `$1\n${body}\n$2`) : text
+  return re.test(text) ? text.replace(re, (_m, open: string, close: string) => `${open}\n${body}\n${close}`) : text
 }
 
+const TRIGGERS_IN_BRIEF =
+  'T1 they step down; T2 no catalogue update for 60 days and two libraries unanswered for 30; T3 under 30 days of storage left; T4 five of the seven libraries ask for removal'
+
+/**
+ * The successor block of STEWARDSHIP.md: the named successor, their key, and the
+ * conditions under which they take over, all in one place. Before the live
+ * ceremony it says plainly that it is a plan; afterwards every name has an address.
+ */
 export function renderSuccessorBlock(c: StewardshipConfig): string {
-  const current = c.stewards.find((s) => s.address && s.address === c.currentSteward)
-  const next = c.stewards.find((s) => s.address && s.address === c.designatedSuccessor)
-  const fallback = c.stewards[1]
-  if (!c.designatedSuccessor || !next) {
+  const find = (a: string | null) => (a ? c.stewards.find((s) => sameAddress(s.address, a)) : undefined)
+  const current = find(c.currentSteward)
+  const next = find(c.designatedSuccessor)
+  const last = c.history.at(-1)
+  const key = (a: string | null | undefined) => (a ? `\`${a}\`` : PENDING_KEY)
+
+  if (!current || !next) {
+    const [planFirst, planNext] = c.stewards
     return [
-      `**Designated successor:** ${fallback?.name ?? 'the second steward'}, steward key ${PENDING}`,
+      '**Status: planned, not yet in force.** The live ceremony has not run yet, so nobody has signed anything.',
       '',
-      `**Current steward:** ${current ? `${current.name}, \`${current.address}\`` : PENDING}`,
+      `**First steward:** ${planFirst?.name ?? 'the first steward'}, key ${key(planFirst?.address)}`,
+      '',
+      `**Designated successor:** ${planNext?.name ?? 'the second steward'}, key ${key(planNext?.address)}. This becomes binding when ${planFirst?.name ?? 'the first steward'} signs the genesis statement that names them.`,
+      '',
+      `**When the successor takes over:** when any trigger in §4 is met (${TRIGGERS_IN_BRIEF}), with 4 of the 7 library seals.`,
     ].join('\n')
   }
   return [
-    `**Designated successor:** ${next.name}, steward key \`${next.address}\``,
+    `**Current steward:** ${current.name}, key \`${current.address}\`${last ? ` (since epoch ${last.epoch}, ${last.at.slice(0, 10)}; register update #${last.registryFeedIndex}${last.record ? `; evidence in [${last.record}](${last.record})` : ''})` : ''}`,
     '',
-    `**Current steward:** ${current ? `${current.name}, \`${current.address}\`` : PENDING}`,
+    `**Designated successor:** ${next.name}, key \`${next.address}\`. ${current.name} named ${next.name} in the acceptance they signed with their own key when they took over.`,
+    '',
+    `**When ${next.name} takes over:** as soon as any trigger in §4 is met (${TRIGGERS_IN_BRIEF}). Handing over to ${next.name} needs 4 of the 7 library seals; handing over to anyone else needs 5 of 7. ${current.name}'s own key is not needed.`,
   ].join('\n')
 }
 
 export function renderIdentitiesBlock(c: StewardshipConfig): string {
-  const a = (x: string | null) => (x ? `\`${x}\`` : PENDING)
+  const a = (x: string | null, pending = PENDING_KEY) => (x ? `\`${x}\`` : pending)
   const rows = [
     '| Role | Who | Address (public) |',
     '|---|---|---|',
-    `| Payer (storage custodian) | the shared Bee node's wallet | ${a(c.payer.nodeAddress)} |`,
+    `| Payer (storage custodian) | the shared Bee node's wallet | ${a(c.payer.nodeAddress, PENDING_PAYER)} |`,
     `| Council scribe (owns the registry feed) | held by the council secretary | ${a(c.council.scribe.address)} |`,
     ...c.stewards.map((s) => `| Steward key | ${s.name} (${s.library}) | ${a(s.address)} |`),
     ...c.libraries.map((l) => `| Library committee key | ${l.name} (${l.valley}) | ${a(l.address)} |`),
@@ -170,14 +190,27 @@ export function renderIdentitiesBlock(c: StewardshipConfig): string {
 export function renderAnchorBlock(c: StewardshipConfig): string {
   return [
     '```',
-    `registry owner (council scribe) : ${c.council.scribe.address ?? '(after the live ceremony)'}`,
+    `registry owner (council scribe) : ${c.council.scribe.address ?? PENDING_REGISTRY}`,
     `registry topic                  : ${c.topics.registry.string}`,
     `registry topic (hex)            : ${c.topics.registry.hex}`,
-    `registry feed manifest          : ${c.registryManifest ?? '(after the live ceremony)'}`,
+    `registry feed manifest          : ${c.registryManifest ?? PENDING_REGISTRY}`,
     `catalogue topic                 : ${c.topics.catalogue.string}  (${c.topics.catalogue.hex})`,
     `corrections topic               : ${c.topics.corrections.string}  (${c.topics.corrections.hex})`,
     '```',
   ].join('\n')
+}
+
+/** One line for the README: has a real hand-off happened yet, and where is the proof. */
+export function renderStatusBlock(c: StewardshipConfig): string {
+  const handoffs = c.history.filter((h) => h.epoch > 0)
+  if (!handoffs.length) {
+    return '**Status:** rehearsed, not yet performed live. `npm run ceremony -- --live --yes` performs it on a Bee node and writes the evidence into `handoffs/` and [HANDOFF_LOG.md](HANDOFF_LOG.md).'
+  }
+  const lines = handoffs.map((h) => {
+    const prev = c.history.find((x) => x.epoch === h.epoch - 1)
+    return `- Epoch ${h.epoch}, ${h.at.slice(0, 10)}: ${prev?.stewardName ?? 'previous steward'} → **${h.stewardName}** \`${h.steward}\`, register update #${h.registryFeedIndex}${h.record ? `, evidence [${h.record}](${h.record})` : ''}`
+  })
+  return ['**Status:** performed live on a Bee node, not only rehearsed.', '', ...lines].join('\n')
 }
 
 export function syncDocs(config: StewardshipConfig = loadConfig()): string[] {
@@ -188,6 +221,7 @@ export function syncDocs(config: StewardshipConfig = loadConfig()): string[] {
     let after = block('successor', renderSuccessorBlock(config), before)
     after = block('identities', renderIdentitiesBlock(config), after)
     after = block('anchor', renderAnchorBlock(config), after)
+    after = block('status', renderStatusBlock(config), after)
     if (after !== before) {
       writeFileSync(path, after)
       touched.push(path)

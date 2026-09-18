@@ -35,7 +35,7 @@ import {
   storageStatusCmd,
   type Ctx,
 } from '../src/node/commands.js'
-import { charterFromConfig, loadSeed, requireAnchor, stewardByKey } from '../src/node/config.js'
+import { charterFromConfig, loadSeed, requireAnchor, stewardByKey, syncDocs } from '../src/node/config.js'
 import { loadProposal, rehearsalPath, saveProposal } from '../src/node/evidence.js'
 import { loadIdentity } from '../src/node/keys.js'
 import { repoPath } from '../src/node/paths.js'
@@ -225,11 +225,13 @@ async function live() {
   act('8. Read it back with no keys at all')
   await read({ bee: args.bee })
 
-  act('9. Secret audit')
+  act('9. Documents and secret audit')
+  const synced = syncDocs()
+  if (synced.length) say(`refreshed ${synced.map(repoPath).join(', ')} from stewardship.config.json`)
   const hits = auditSecrets()
   if (hits.length) throw new Error(`secret audit failed: ${hits.map((h) => `${h.file}:${h.line} ${h.kind}`).join(', ')}`)
   say('clean')
-  say('\nCommit handoffs/, HANDOFF_LOG.md, STORAGE_LOG.md, ledger/, stewardship.config.json and STEWARDSHIP.md.')
+  say('\nCommit handoffs/, HANDOFF_LOG.md, STORAGE_LOG.md, ledger/, stewardship.config.json, STEWARDSHIP.md, README.md and docs/.')
 }
 
 const run = args.live ? live : args.rehearse ? rehearseAll : null

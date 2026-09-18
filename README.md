@@ -8,7 +8,11 @@ The short version:
 - **Nobody can change the steward alone.** A hand-off needs **4 of the 7 library seals** (5 of 7 for someone the outgoing steward didn't name), plus the incoming steward's own signature. Readers check the seals themselves, so not even the scribe can redirect them.
 - **Paying, publishing and deciding are three different keys.** The Bee node's wallet pays for storage. Each steward signs on their own feed. The libraries decide. The tools refuse to run if any two roles share a key.
 - **Corrections don't need the steward.** Each library posts signed corrections about its own shelves to its own feed. Readers see them at once, and the next steward, whoever that is, folds them in.
-- **The succession has actually been performed** (see [HANDOFF_LOG.md](HANDOFF_LOG.md)), and the arrangement is written down in plain language in [STEWARDSHIP.md](STEWARDSHIP.md).
+- **The succession is performed for real, not only simulated**: `ceremony --live` runs it on a Bee node and records every signature and feed index in [HANDOFF_LOG.md](HANDOFF_LOG.md). The arrangement is written down in plain language in [STEWARDSHIP.md](STEWARDSHIP.md).
+
+<!-- lsc:status -->
+**Status:** rehearsed, not yet performed live. `npm run ceremony -- --live --yes` performs it on a Bee node and writes the evidence into `handoffs/` and [HANDOFF_LOG.md](HANDOFF_LOG.md).
+<!-- /lsc:status -->
 
 ## Where to start reading
 
@@ -24,10 +28,10 @@ The public anchor:
 
 <!-- lsc:anchor -->
 ```
-registry owner (council scribe) : (after the live ceremony)
+registry owner (council scribe) : (created by the first live hand-off)
 registry topic                  : lsc/registry/v1
 registry topic (hex)            : f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46967eb51c77a4b88a6d
-registry feed manifest          : (after the live ceremony)
+registry feed manifest          : (created by the first live hand-off)
 catalogue topic                 : lsc/catalogue/v1  (5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f)
 corrections topic               : lsc/corrections/v1  (2cf9be53bb7408cee80ea7678ddcb7700e4ae3167670105625954316124ee633)
 ```

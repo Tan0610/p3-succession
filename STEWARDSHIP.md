@@ -30,18 +30,18 @@ The public addresses for every role are listed here and in `stewardship.config.j
 <!-- lsc:identities -->
 | Role | Who | Address (public) |
 |---|---|---|
-| Payer (storage custodian) | the shared Bee node's wallet | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Council scribe (owns the registry feed) | held by the council secretary | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Steward key | Ngawang Dorje (hemis) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Steward key | Padma Chodon (tabo) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Steward key | Stanzin Namgyal (thiksey) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Library committee key | Diskit library committee (Ladakh) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Library committee key | Thiksey library committee (Ladakh) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Library committee key | Hemis library committee (Ladakh) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Library committee key | Alchi library committee (Ladakh) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Library committee key | Lamayuru library committee (Ladakh) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Library committee key | Kye library committee (Spiti) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
-| Library committee key | Tabo library committee (Spiti) | _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_ |
+| Payer (storage custodian) | the shared Bee node's wallet | _(no batch yet: `npm run cli -- storage buy` or `storage use` fills this in)_ |
+| Council scribe (owns the registry feed) | held by the council secretary | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Steward key | Ngawang Dorje (hemis) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Steward key | Padma Chodon (tabo) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Steward key | Stanzin Namgyal (thiksey) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Library committee key | Diskit library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Library committee key | Thiksey library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Library committee key | Hemis library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Library committee key | Alchi library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Library committee key | Lamayuru library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Library committee key | Kye library committee (Spiti) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Library committee key | Tabo library committee (Spiti) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
 <!-- /lsc:identities -->
 
 ## 3. Who comes next
@@ -49,9 +49,13 @@ The public addresses for every role are listed here and in `stewardship.config.j
 Every steward, when they accept the role, names the person they would like to follow them. They sign this with their own key while they are still able to. It is their **standing designation**, and it stays on record even if they later become unreachable.
 
 <!-- lsc:successor -->
-**Designated successor:** Padma Chodon, steward key _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_
+**Status: planned, not yet in force.** The live ceremony has not run yet, so nobody has signed anything.
 
-**Current steward:** _(not generated yet: filled in automatically by `npm run cli -- keys init` during the live ceremony)_
+**First steward:** Ngawang Dorje, key _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_
+
+**Designated successor:** Padma Chodon, key _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_. This becomes binding when Ngawang Dorje signs the genesis statement that names them.
+
+**When the successor takes over:** when any trigger in §4 is met (T1 they step down; T2 no catalogue update for 60 days and two libraries unanswered for 30; T3 under 30 days of storage left; T4 five of the seven libraries ask for removal), with 4 of the 7 library seals.
 <!-- /lsc:successor -->
 
 Handing over to the designated successor needs **4 of the 7 seals**. Handing over to anyone else needs **5 of the 7**, because it overrides the outgoing steward's own wish.
@@ -117,10 +121,10 @@ This agreement may be changed with the seals of **5 of the 7** libraries. The ch
 
 <!-- lsc:anchor -->
 ```
-registry owner (council scribe) : (after the live ceremony)
+registry owner (council scribe) : (created by the first live hand-off)
 registry topic                  : lsc/registry/v1
 registry topic (hex)            : f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46967eb51c77a4b88a6d
-registry feed manifest          : (after the live ceremony)
+registry feed manifest          : (created by the first live hand-off)
 catalogue topic                 : lsc/catalogue/v1  (5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f)
 corrections topic               : lsc/corrections/v1  (2cf9be53bb7408cee80ea7678ddcb7700e4ae3167670105625954316124ee633)
 ```
