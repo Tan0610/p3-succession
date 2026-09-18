@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest'
 import { resolveNextIndex } from '../src/core/feedstore.js'
 import { HttpFeedStore } from '../src/core/http-feedstore.js'
 import { MemoryFeedStore } from '../src/core/memory-feedstore.js'
+import { readBackRegistry } from '../src/core/operations.js'
+import { defaultAnchor } from '../src/core/resolve.js'
 import { feedIdentifier, feedUpdateAddress, TOPICS, topicHex, uint64be } from '../src/core/swarm.js'
 import { BeeFeedStore } from '../src/node/bee.js'
 
@@ -22,11 +24,23 @@ describe('next index is read from the network', () => {
     expect(await resolveNextIndex(new BeeFeedStore(bee, null), owner, topic)).toEqual({ latest: null, next: 0n })
   })
 
-  it('any other error is NOT treated as an empty feed', async () => {
+  it('any other error is NOT treated as an empty feed (after retrying it)', async () => {
+    let calls = 0
     const bee = fakeBee(async () => {
+      calls++
       throw new BeeResponseError('GET', 'feeds', 'boom', undefined, 500)
     })
-    await expect(resolveNextIndex(new BeeFeedStore(bee, null), owner, topic)).rejects.toThrow('boom')
+    await expect(resolveNextIndex(new BeeFeedStore(bee, null, { attempts: 3, baseMs: 1 }), owner, topic)).rejects.toThrow('boom')
+    expect(calls).toBe(3)
+  })
+
+  it('a slow node is retried: a timeout followed by an answer is an answer', async () => {
+    let calls = 0
+    const bee = fakeBee(async () => {
+      if (++calls === 1) throw new BeeResponseError('GET', 'feeds', 'timeout', undefined, 504)
+      return { reference: new Reference('ab'.repeat(32)), feedIndex: FeedIndex.fromBigInt(2n), feedIndexNext: FeedIndex.fromBigInt(3n) }
+    })
+    expect(await resolveNextIndex(new BeeFeedStore(bee, null, { attempts: 3, baseMs: 1 }), owner, topic)).toEqual({ latest: 2n, next: 3n })
   })
 
   it('an existing feed continues after its latest index', async () => {
@@ -70,5 +84,22 @@ describe('keyless HTTP reader', () => {
       return new Response(null, { status: present.has(addr) ? 200 : 500 })
     }
     expect(await new HttpFeedStore('http://gw', fetcher).latestIndex(owner, topic)).toBe(4n)
+  })
+})
+
+describe('after the registry is written', () => {
+  it('a read-back that keeps failing is recorded as missing instead of throwing away the hand-off', async () => {
+    const failing = {
+      label: 'flaky',
+      latestIndex: async () => {
+        throw new Error('node busy')
+      },
+      readRefAt: async () => {
+        throw new Error('node busy')
+      },
+      readJson: async () => ({}),
+    }
+    const back = await readBackRegistry(failing, defaultAnchor(owner), owner, 0n, owner, { attempts: 2, waitMs: 1 })
+    expect(back).toEqual({ reference: '', proof: null, readerNowFollows: null })
   })
 })

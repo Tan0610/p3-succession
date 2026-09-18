@@ -403,7 +403,8 @@ export async function handoff(
   }
 
   // first entry: create the stable registry manifest readers can bookmark forever
-  if (!c.config.registryManifest) c.config.registryManifest = await store.createFeedManifest(anchor.registryTopicHex, scribe.address)
+  // (a failure here must not stop the evidence being written: it is retried on the next hand-off)
+  if (!c.config.registryManifest) c.config.registryManifest = await store.createFeedManifest(anchor.registryTopicHex, scribe.address).catch(() => null)
   const status = await storageStatus(c.bee, requireBatch(c)).catch(() => null)
   const versions = await c.bee.status.getHealth().catch(() => null)
   const record = recordFor(outcome, {

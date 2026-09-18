@@ -1,7 +1,7 @@
 import type { BaseWallet } from 'ethers'
 import { hashCanonical, utf8 } from './canonical.js'
 import { nextCatalogue, renderCatalogueCsv, renderCatalogueHtml } from './catalogue.js'
-import { resolveNextIndex, type FeedWriteStore, type Identity, type SocProof } from './feedstore.js'
+import { resolveNextIndex, type FeedReadStore, type FeedWriteStore, type Identity, type SocProof } from './feedstore.js'
 import { readPendingCorrections, readRegistry, resolveAll, type Anchor, type ResolvedEntry } from './resolve.js'
 import {
   Charter,
@@ -331,18 +331,52 @@ export async function performHandoff(opts: {
   const { next } = await resolveNextIndex(store, scribe.address, anchor.registryTopicHex)
   const { socAddress } = await store.writeRef(scribe, anchor.registryTopicHex, next, entryReference)
 
-  const readRef = await store.readRefAt(scribe.address, anchor.registryTopicHex, next)
-  const proof = store.socProof ? await store.socProof(scribe.address, anchor.registryTopicHex, next) : null
-  const after = await readRegistry(store, anchor)
+  // The registry update is written. From here on nothing may throw: a slow
+  // read-back must not lose the evidence of a hand-off that really happened.
+  const back = await readBackRegistry(store, anchor, scribe.address, next, f.incoming.address)
   return {
     entry,
     entryReference,
     feedIndex: Number(next),
     socAddress,
-    proof,
-    readBack: { feedIndex: Number(next), entryReference: readRef, match: readRef === entryReference },
+    proof: back.proof,
+    readBack: { feedIndex: Number(next), entryReference: back.reference, match: back.reference === entryReference },
     quorum,
     catalogueManifest,
-    readerNowFollows: after.current?.entry?.steward.address ?? null,
+    readerNowFollows: back.readerNowFollows,
   }
+}
+
+/**
+ * Reads a fresh registry update back the way a stranger would, retrying while
+ * the node catches up (a feed lookup can briefly still answer the previous
+ * index). Never throws; whatever could not be read is recorded as missing and
+ * can be re-checked later with `npm run verify:handoff`.
+ */
+export async function readBackRegistry(
+  store: FeedReadStore,
+  anchor: Anchor,
+  scribe: string,
+  index: bigint,
+  expectSteward: string,
+  opts: { attempts?: number; waitMs?: number } = {},
+): Promise<{ reference: string; proof: SocProof | null; readerNowFollows: string | null }> {
+  const attempts = opts.attempts ?? 6
+  const waitMs = opts.waitMs ?? 5_000
+  let reference = ''
+  let proof: SocProof | null = null
+  let readerNowFollows: string | null = null
+  for (let i = 0; i < attempts; i++) {
+    if (i > 0) await new Promise((r) => setTimeout(r, waitMs))
+    try {
+      reference ||= await store.readRefAt(scribe, anchor.registryTopicHex, index)
+      if (!proof && store.socProof) proof = await store.socProof(scribe, anchor.registryTopicHex, index)
+      const after = await readRegistry(store, anchor)
+      readerNowFollows = after.current?.entry?.steward.address ?? null
+      if (sameAddress(readerNowFollows, expectSteward)) break
+    } catch {
+      // not visible yet; try again
+    }
+  }
+  return { reference, proof, readerNowFollows }
 }
