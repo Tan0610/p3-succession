@@ -16,7 +16,7 @@ import {
   type HandoffOutcome,
 } from '../core/operations.js'
 import { readRegistry, resolveAll, defaultAnchor, type Anchor, type CatalogueView } from '../core/resolve.js'
-import { CorrectionChanges, LibraryId, TriggerId, type Condition, type HandoffProposal } from '../core/schemas.js'
+import { Catalogue, CorrectionChanges, LibraryId, TriggerId, type Condition, type HandoffProposal } from '../core/schemas.js'
 import { recoverSigner, verifyQuorum, requiredThreshold } from '../core/signatures.js'
 import { feedUpdateAddress, sameAddress, shortHex } from '../core/swarm.js'
 import { evaluateTriggers } from '../core/triggers.js'
@@ -71,7 +71,7 @@ function writeStore(c: Ctx): BeeFeedStore {
 }
 
 function requireBatch(c: Ctx): string {
-  if (!c.config.payer.batchId) throw new Error('No postage batch yet. Run `npm run cli -- storage buy --mb 100 --days 14 --yes` or `storage use <batchId>`.')
+  if (!c.config.payer.batchId) throw new Error('No postage batch yet. Run `npm run cli -- storage buy --mb 5 --days 14 --yes` or `storage use <batchId>`.')
   return c.config.payer.batchId
 }
 
@@ -124,7 +124,7 @@ export async function storageStatusCmd(c: Ctx): Promise<StorageStatus | null> {
     `Batch ${s.batchId} "${s.label}"`,
     `  paid until ${s.expiresAt}  (~${s.ttlDays} days, node's estimate at today's price)`,
     `  usage ${s.usageText}, depth ${s.depth}, ${s.usable ? 'usable' : 'NOT usable'}`,
-    s.ttlDays < floor ? `  !! below the ${floor}-day floor in STEWARDSHIP.md (trigger T3): top it up now. Anyone may.` : '',
+    ...(s.ttlDays < floor ? [`  !! below the ${floor}-day floor in STEWARDSHIP.md (trigger T3): top it up now. Anyone may.`] : []),
   )
   return s
 }
@@ -231,7 +231,7 @@ export async function cataloguePublish(c: Ctx, opts: { as: string; summary?: str
     `  feed update #${result.feedIndex} on ${c.config.topics.catalogue.string}, collection ${result.reference}`,
     `  read it     ${c.url}/bzz/${result.manifest}/`,
     `  ${st.total} works, ${st.byCondition.damaged} damaged, ${st.byCondition.missing} missing; ${result.applied} correction(s) applied, ${result.proposed} proposed`,
-    result.inheritedFrom ? `  (picked up from predecessor ${personName(c.config, result.inheritedFrom)})` : '',
+    ...(result.inheritedFrom ? [`  (picked up from predecessor ${personName(c.config, result.inheritedFrom)})`] : []),
   )
   // the signed chunk of this update, read back: proof the NEW steward's key signed it
   const proof = await store.socProof(steward.address, requireAnchor(c.config).catalogueTopicHex, BigInt(result.feedIndex)).catch(() => null)
@@ -509,6 +509,19 @@ export async function recoverHandoffRecords(c: Ctx): Promise<string[]> {
       notes: ['This record was rebuilt from the registry entry on the network after the ceremony was interrupted between writing the registry and writing this file. Every signature and index in it was read back from Swarm.'],
     })
     recovered.push(`epoch ${e.epoch}`)
+    // If the new steward has already published, close the loop in the record too.
+    if (e.epoch > 0 && (await store.hasUpdate(e.steward.address, anchor.catalogueTopicHex, 0n))) {
+      const reference = await store.readRefAt(e.steward.address, anchor.catalogueTopicHex, 0n)
+      const cat = Catalogue.parse(await store.readJson(reference, 'catalogue.json'))
+      const before = cat.previousVersion ? Catalogue.parse(await store.readJson(cat.previousVersion.reference, 'catalogue.json')).appliedCorrections.length : 0
+      const fresh = cat.appliedCorrections.slice(before) // append-only, so this is exactly what this version added
+      const soc = await store.socProof(e.steward.address, anchor.catalogueTopicHex, 0n).catch(() => null)
+      noteSuccessorPublication(e.steward.address, {
+        feedIndex: 0, catalogueReference: reference, version: cat.version, at: cat.publishedAt,
+        applied: fresh.filter((a) => a.status === 'applied').length, proposed: fresh.filter((a) => a.status === 'proposed').length,
+        socAddress: feedUpdateAddress(e.steward.address, anchor.catalogueTopicHex, 0n), socOwner: soc?.owner ?? null, socSignature: soc?.signature ?? null,
+      })
+    }
   }
   return recovered
 }

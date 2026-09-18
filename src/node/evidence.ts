@@ -192,7 +192,7 @@ export function noteSuccessorPublication(stewardAddress: string, pub: NonNullabl
     PATHS.handoffLog,
     `\n> Epoch ${match.record.epoch} follow-up, ${pub.at}: ${match.record.incoming.name} published catalogue v${pub.version} ` +
       `on their own feed (update #${pub.feedIndex}, collection \`${pub.catalogueReference}\`, signed chunk \`${pub.socAddress}\` ` +
-      `owned by \`${pub.socOwner ?? 'not read back'}\`, the incoming key), applying ${pub.applied} library correction(s) and keeping ${pub.proposed} as proposals.\n`,
+      `owned by \`${pub.socOwner ?? 'not read back'}\`, the steward's own key), applying ${pub.applied} library correction(s) and keeping ${pub.proposed} as proposals.\n`,
   )
   return repoPath(match.path)
 }
