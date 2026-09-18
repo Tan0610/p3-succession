@@ -1,0 +1,716 @@
+{
+  "schema": "lsc/catalogue-seed@1",
+  "catalogueId": "ladakh-spiti-manuscripts",
+  "notice": "ILLUSTRATIVE SAMPLE DATA: these entries were generated for a hackathon demonstration and are not a real inventory of any monastery library.",
+  "libraries": [
+    {
+      "id": "diskit",
+      "name": "Diskit library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "id": "thiksey",
+      "name": "Thiksey library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "id": "hemis",
+      "name": "Hemis library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "id": "alchi",
+      "name": "Alchi library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "id": "lamayuru",
+      "name": "Lamayuru library committee",
+      "valley": "Ladakh"
+    },
+    {
+      "id": "kye",
+      "name": "Kye library committee",
+      "valley": "Spiti"
+    },
+    {
+      "id": "tabo",
+      "name": "Tabo library committee",
+      "valley": "Spiti"
+    }
+  ],
+  "records": [
+    {
+      "id": "DSK-0001",
+      "library": "diskit",
+      "title": "Perfection of Wisdom in eight thousand lines",
+      "collection": "Sutra",
+      "form": "pecha",
+      "folios": {
+        "total": 412,
+        "present": 412
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "DSK-0002",
+      "library": "diskit",
+      "title": "Medical compendium with marginal commentary",
+      "collection": "Medicine",
+      "form": "pecha",
+      "folios": {
+        "total": 186,
+        "present": 186
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "DSK-0003",
+      "library": "diskit",
+      "title": "Collected verses of praise",
+      "collection": "Liturgy",
+      "form": "pecha",
+      "folios": {
+        "total": 64,
+        "present": 64
+      },
+      "condition": "fragile",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "DSK-0004",
+      "library": "diskit",
+      "title": "Astronomical and calendrical tables",
+      "collection": "Astrology",
+      "form": "bound",
+      "folios": {
+        "total": 48,
+        "present": 48
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "DSK-0005",
+      "library": "diskit",
+      "title": "Grammar of the classical language",
+      "collection": "Grammar",
+      "form": "pecha",
+      "folios": {
+        "total": 97,
+        "present": 97
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "DSK-0006",
+      "library": "diskit",
+      "title": "Ritual manual for the new-year rites",
+      "collection": "Ritual",
+      "form": "pecha",
+      "folios": {
+        "total": 38,
+        "present": 38
+      },
+      "condition": "good",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "THK-0001",
+      "library": "thiksey",
+      "title": "Biography of a founding teacher",
+      "collection": "Biography",
+      "form": "pecha",
+      "folios": {
+        "total": 221,
+        "present": 221
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "THK-0002",
+      "library": "thiksey",
+      "title": "Birch-bark leaves, unidentified",
+      "collection": "Unsorted",
+      "form": "scroll",
+      "folios": {
+        "total": 17,
+        "present": 8
+      },
+      "condition": "damaged",
+      "photographed": true,
+      "notes": "Edges crumbling; handle with gloves.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "THK-0003",
+      "library": "thiksey",
+      "title": "Monastery land and grain register",
+      "collection": "Records",
+      "form": "bound",
+      "folios": {
+        "total": 130,
+        "present": 130
+      },
+      "condition": "fragile",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "THK-0004",
+      "library": "thiksey",
+      "title": "Commentary on the middle way",
+      "collection": "Philosophy",
+      "form": "pecha",
+      "folios": {
+        "total": 305,
+        "present": 305
+      },
+      "condition": "fragile",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "THK-0005",
+      "library": "thiksey",
+      "title": "Book of protective verses",
+      "collection": "Liturgy",
+      "form": "pecha",
+      "folios": {
+        "total": 52,
+        "present": 52
+      },
+      "condition": "good",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "THK-0006",
+      "library": "thiksey",
+      "title": "Herbal materia medica, illustrated",
+      "collection": "Medicine",
+      "form": "pecha",
+      "folios": {
+        "total": 144,
+        "present": 131
+      },
+      "condition": "damaged",
+      "photographed": false,
+      "notes": "Edges crumbling; handle with gloves.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "HMS-0001",
+      "library": "hemis",
+      "title": "Perfection of Wisdom in eight thousand lines",
+      "collection": "Sutra",
+      "form": "pecha",
+      "folios": {
+        "total": 412,
+        "present": 412
+      },
+      "condition": "good",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "HMS-0002",
+      "library": "hemis",
+      "title": "Medical compendium with marginal commentary",
+      "collection": "Medicine",
+      "form": "pecha",
+      "folios": {
+        "total": 186,
+        "present": 177
+      },
+      "condition": "damaged",
+      "photographed": false,
+      "notes": "Edges crumbling; handle with gloves.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "HMS-0003",
+      "library": "hemis",
+      "title": "Collected verses of praise",
+      "collection": "Liturgy",
+      "form": "pecha",
+      "folios": {
+        "total": 64,
+        "present": 0
+      },
+      "condition": "missing",
+      "photographed": false,
+      "notes": "Listed in the 1978 inventory; not found on the shelf.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "HMS-0004",
+      "library": "hemis",
+      "title": "Astronomical and calendrical tables",
+      "collection": "Astrology",
+      "form": "bound",
+      "folios": {
+        "total": 48,
+        "present": 48
+      },
+      "condition": "good",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "HMS-0005",
+      "library": "hemis",
+      "title": "Grammar of the classical language",
+      "collection": "Grammar",
+      "form": "pecha",
+      "folios": {
+        "total": 97,
+        "present": 97
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "HMS-0006",
+      "library": "hemis",
+      "title": "Ritual manual for the new-year rites",
+      "collection": "Ritual",
+      "form": "pecha",
+      "folios": {
+        "total": 38,
+        "present": 25
+      },
+      "condition": "damaged",
+      "photographed": false,
+      "notes": "Edges crumbling; handle with gloves.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "ALC-0001",
+      "library": "alchi",
+      "title": "Biography of a founding teacher",
+      "collection": "Biography",
+      "form": "pecha",
+      "folios": {
+        "total": 221,
+        "present": 221
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "ALC-0002",
+      "library": "alchi",
+      "title": "Birch-bark leaves, unidentified",
+      "collection": "Unsorted",
+      "form": "scroll",
+      "folios": {
+        "total": 17,
+        "present": 17
+      },
+      "condition": "fragile",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "ALC-0003",
+      "library": "alchi",
+      "title": "Monastery land and grain register",
+      "collection": "Records",
+      "form": "bound",
+      "folios": {
+        "total": 130,
+        "present": 130
+      },
+      "condition": "good",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "ALC-0004",
+      "library": "alchi",
+      "title": "Commentary on the middle way",
+      "collection": "Philosophy",
+      "form": "pecha",
+      "folios": {
+        "total": 305,
+        "present": 305
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "ALC-0005",
+      "library": "alchi",
+      "title": "Book of protective verses",
+      "collection": "Liturgy",
+      "form": "pecha",
+      "folios": {
+        "total": 52,
+        "present": 52
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "ALC-0006",
+      "library": "alchi",
+      "title": "Herbal materia medica, illustrated",
+      "collection": "Medicine",
+      "form": "pecha",
+      "folios": {
+        "total": 144,
+        "present": 144
+      },
+      "condition": "fragile",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "LMY-0001",
+      "library": "lamayuru",
+      "title": "Perfection of Wisdom in eight thousand lines",
+      "collection": "Sutra",
+      "form": "pecha",
+      "folios": {
+        "total": 412,
+        "present": 404
+      },
+      "condition": "damaged",
+      "photographed": false,
+      "notes": "Edges crumbling; handle with gloves.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "LMY-0002",
+      "library": "lamayuru",
+      "title": "Medical compendium with marginal commentary",
+      "collection": "Medicine",
+      "form": "pecha",
+      "folios": {
+        "total": 186,
+        "present": 186
+      },
+      "condition": "fragile",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "LMY-0003",
+      "library": "lamayuru",
+      "title": "Collected verses of praise",
+      "collection": "Liturgy",
+      "form": "pecha",
+      "folios": {
+        "total": 64,
+        "present": 64
+      },
+      "condition": "fragile",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "LMY-0004",
+      "library": "lamayuru",
+      "title": "Astronomical and calendrical tables",
+      "collection": "Astrology",
+      "form": "bound",
+      "folios": {
+        "total": 48,
+        "present": 48
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "LMY-0005",
+      "library": "lamayuru",
+      "title": "Grammar of the classical language",
+      "collection": "Grammar",
+      "form": "pecha",
+      "folios": {
+        "total": 97,
+        "present": 85
+      },
+      "condition": "damaged",
+      "photographed": true,
+      "notes": "Edges crumbling; handle with gloves.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "LMY-0006",
+      "library": "lamayuru",
+      "title": "Ritual manual for the new-year rites",
+      "collection": "Ritual",
+      "form": "pecha",
+      "folios": {
+        "total": 38,
+        "present": 38
+      },
+      "condition": "fragile",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "KYE-0001",
+      "library": "kye",
+      "title": "Biography of a founding teacher",
+      "collection": "Biography",
+      "form": "pecha",
+      "folios": {
+        "total": 221,
+        "present": 213
+      },
+      "condition": "damaged",
+      "photographed": true,
+      "notes": "Edges crumbling; handle with gloves.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "KYE-0002",
+      "library": "kye",
+      "title": "Birch-bark leaves, unidentified",
+      "collection": "Unsorted",
+      "form": "scroll",
+      "folios": {
+        "total": 17,
+        "present": 0
+      },
+      "condition": "missing",
+      "photographed": false,
+      "notes": "Listed in the 1978 inventory; not found on the shelf.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "KYE-0003",
+      "library": "kye",
+      "title": "Monastery land and grain register",
+      "collection": "Records",
+      "form": "bound",
+      "folios": {
+        "total": 130,
+        "present": 130
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "KYE-0004",
+      "library": "kye",
+      "title": "Commentary on the middle way",
+      "collection": "Philosophy",
+      "form": "pecha",
+      "folios": {
+        "total": 305,
+        "present": 305
+      },
+      "condition": "good",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "KYE-0005",
+      "library": "kye",
+      "title": "Book of protective verses",
+      "collection": "Liturgy",
+      "form": "pecha",
+      "folios": {
+        "total": 52,
+        "present": 40
+      },
+      "condition": "damaged",
+      "photographed": false,
+      "notes": "Edges crumbling; handle with gloves.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "KYE-0006",
+      "library": "kye",
+      "title": "Herbal materia medica, illustrated",
+      "collection": "Medicine",
+      "form": "pecha",
+      "folios": {
+        "total": 144,
+        "present": 0
+      },
+      "condition": "missing",
+      "photographed": false,
+      "notes": "Listed in the 1978 inventory; not found on the shelf.",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "TABO-0001",
+      "library": "tabo",
+      "title": "Perfection of Wisdom in eight thousand lines",
+      "collection": "Sutra",
+      "form": "pecha",
+      "folios": {
+        "total": 412,
+        "present": 412
+      },
+      "condition": "fragile",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "TABO-0002",
+      "library": "tabo",
+      "title": "Medical compendium with marginal commentary",
+      "collection": "Medicine",
+      "form": "pecha",
+      "folios": {
+        "total": 186,
+        "present": 186
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "TABO-0003",
+      "library": "tabo",
+      "title": "Collected verses of praise",
+      "collection": "Liturgy",
+      "form": "pecha",
+      "folios": {
+        "total": 64,
+        "present": 64
+      },
+      "condition": "good",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "TABO-0004",
+      "library": "tabo",
+      "title": "Astronomical and calendrical tables",
+      "collection": "Astrology",
+      "form": "bound",
+      "folios": {
+        "total": 48,
+        "present": 48
+      },
+      "condition": "good",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "TABO-0005",
+      "library": "tabo",
+      "title": "Grammar of the classical language",
+      "collection": "Grammar",
+      "form": "pecha",
+      "folios": {
+        "total": 97,
+        "present": 97
+      },
+      "condition": "fragile",
+      "photographed": false,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "TABO-0006",
+      "library": "tabo",
+      "title": "Ritual manual for the new-year rites",
+      "collection": "Ritual",
+      "form": "pecha",
+      "folios": {
+        "total": 38,
+        "present": 38
+      },
+      "condition": "good",
+      "photographed": true,
+      "notes": "",
+      "updatedAt": "2026-09-01T00:00:00.000Z",
+      "updatedBy": "seed"
+    }
+  ]
+}
