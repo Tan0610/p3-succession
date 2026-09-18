@@ -1,6 +1,6 @@
 import { existsSync, writeFileSync } from 'node:fs'
 import { relative, resolve } from 'node:path'
-import type { Bee } from '@ethersphere/bee-js'
+import { BZZ, type Bee } from '@ethersphere/bee-js'
 import { stats } from '../core/catalogue.js'
 import type { Identity } from '../core/feedstore.js'
 import {
@@ -47,6 +47,8 @@ import {
   recordLedger,
   storageStatus,
   topUpBatch,
+  waitUntilUsable,
+  walletFunds,
   type StorageStatus,
 } from './storage.js'
 
@@ -137,18 +139,34 @@ export async function storageBuy(c: Ctx, opts: { mb: number; days: number; label
     return null
   }
   const payer = await payerAddress(c.bee)
+  await assertCanPay(c, cost, 'Nothing bought.')
   const batchId = await buyBatch(c.bee, opts.mb, opts.days, opts.label ?? c.config.payer.batchLabel)
+  // Save the id the moment the purchase is mined, before any waiting that could fail.
   c.config.payer.batchId = batchId
   c.config.payer.nodeAddress = payer
   saveConfig(c.config)
   syncDocs(c.config)
-  const s = await storageStatus(c.bee, batchId)
-  recordLedger({
-    at: new Date().toISOString(), action: 'buy', batchId, payer, detail: `${opts.mb} MB for ${opts.days} days`,
-    costBzz: cost, ttlDaysBefore: null, ttlDaysAfter: s.ttlDays, expiresAfter: s.expiresAt,
-  })
-  out(`Bought batch ${batchId}. Paid until ${s.expiresAt}.`)
+  out(`Bought batch ${batchId} (saved to stewardship.config.json). Waiting for the node to call it usable…`)
+  let s: StorageStatus | null = null
+  try {
+    s = await waitUntilUsable(c.bee, batchId, { onWait: (sec) => out(`  not usable yet (${sec} s)`) })
+  } finally {
+    recordLedger({
+      at: new Date().toISOString(), action: 'buy', batchId, payer, detail: `${opts.mb} MB for ${opts.days} days`,
+      costBzz: cost, ttlDaysBefore: null, ttlDaysAfter: s?.ttlDays ?? null, expiresAfter: s?.expiresAt ?? null,
+    })
+  }
+  out(`Batch ${shortHex(batchId)} is usable. Paid until ${s?.expiresAt}.`)
   return batchId
+}
+
+/** Refuses before any transaction if the node wallet can't cover `costBzz` plus gas. */
+export async function assertCanPay(c: Ctx, costBzz: string, refusal: string): Promise<void> {
+  const funds = await walletFunds(c.bee)
+  if (funds.bzz.lt(BZZ.fromDecimalString(costBzz))) {
+    throw new Error(`The node wallet holds ${funds.bzz.toDecimalString()} xBZZ, less than the ${costBzz} xBZZ needed. ${refusal}`)
+  }
+  if (!funds.hasGas) throw new Error(`The node wallet has no xDAI to pay gas. ${refusal}`)
 }
 
 export async function storageUse(c: Ctx, batchId: string): Promise<void> {
@@ -171,6 +189,7 @@ export async function storageExtend(c: Ctx, opts: { days: number; yes?: boolean 
   const cost = await quoteExtend(c.bee, batchId, opts.days)
   out(`Extending batch ${shortHex(batchId)} by ${opts.days} day(s) costs about ${cost} xBZZ.`)
   if (!opts.yes) return out('Nothing spent. Re-run with --yes.')
+  await assertCanPay(c, cost, 'Nothing spent.')
   const { before, after } = await extendBatch(c.bee, batchId, opts.days)
   recordLedger({
     at: new Date().toISOString(), action: 'extend', batchId, payer: before.payer, detail: `+${opts.days} day(s)`,

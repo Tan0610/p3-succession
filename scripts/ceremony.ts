@@ -20,6 +20,7 @@ import { auditSecrets } from '../src/node/audit.js'
 import { BeeFeedStore } from '../src/node/bee.js'
 import {
   accept,
+  assertCanPay,
   cataloguePublish,
   correctionSubmit,
   ctx,
@@ -36,7 +37,7 @@ import { charterFromConfig, loadSeed, requireAnchor, stewardByKey } from '../src
 import { loadProposal, rehearsalPath, saveProposal } from '../src/node/evidence.js'
 import { loadIdentity } from '../src/node/keys.js'
 import { ROOT } from '../src/node/paths.js'
-import { readLedger } from '../src/node/storage.js'
+import { quoteExtend, readLedger, waitUntilUsable } from '../src/node/storage.js'
 
 const { values: args } = parseArgs({
   options: {
@@ -47,6 +48,9 @@ const { values: args } = parseArgs({
     bee: { type: 'string' },
   },
 })
+
+const extendDays = Number(args['extend-days'])
+if (!Number.isFinite(extendDays) || extendDays <= 0) throw new Error('--extend-days must be a positive number')
 
 const say = (s: string) => console.log(s)
 const act = (s: string) => console.log(`\n── ${s} ${'─'.repeat(Math.max(0, 66 - s.length))}`)
@@ -91,8 +95,19 @@ async function live() {
   act('0. Preflight: payer and storage')
   const health = await c.bee.status.getHealth()
   say(`Bee ${health.version} (API ${health.apiVersion}) at ${c.url}`)
-  const status = await storageStatusCmd(c)
-  if (!status) throw new Error('Choose or buy a batch first: npm run cli -- storage buy --mb 100 --days 14 --yes')
+  let status = await storageStatusCmd(c)
+  if (!status) throw new Error('Choose or buy a batch first: npm run cli -- storage buy --mb 5 --days 14 --yes')
+  if (status.ttlDays <= 0) throw new Error(`Batch ${status.batchId} has expired. Buy a new one; an expired batch cannot be revived.`)
+  if (!status.usable) {
+    say('The batch is not usable yet (the node is still waiting for confirmations). Waiting before anything is uploaded…')
+    status = await waitUntilUsable(c.bee, status.batchId, { onWait: (s) => say(`  still waiting (${s} s)`) })
+  }
+  // Every stage below is either free (uploads use the prepaid batch) or the one
+  // extension. Check the wallet can pay for it now, not halfway through.
+  if (!readLedger().some((e) => e.action === 'extend' || e.action === 'topup')) {
+    await assertCanPay(c, await quoteExtend(c.bee, status.batchId, extendDays), 'Stopping before anything is written.')
+  }
+  say(`Batch usable, ${status.ttlDays} days paid, ${status.usageText} used. Wallet can cover the extension.`)
 
   act('1. Keys (private halves stay in .secrets/, git-ignored)')
   keysInit()
@@ -131,7 +146,7 @@ async function live() {
 
   act(`5. Keep the storage alive: extend the existing batch by ${args['extend-days']} day(s)`)
   if (readLedger().some((e) => e.action === 'extend' || e.action === 'topup')) say('already extended once (see STORAGE_LOG.md)')
-  else await storageExtend(fresh(), { days: Number(args['extend-days']), yes: true })
+  else await storageExtend(fresh(), { days: extendDays, yes: true })
 
   act('6. Ngawang goes quiet. The committees move to hand over to Padma.')
   c = fresh()

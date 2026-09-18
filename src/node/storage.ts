@@ -71,9 +71,48 @@ export async function quoteExtend(bee: Bee, batchId: string, days: number): Prom
   return cost.toDecimalString()
 }
 
+/**
+ * Buys a batch and returns its id as soon as the purchase transaction is mined.
+ * bee-js would otherwise block (up to 4 minutes) until the node calls the batch
+ * usable, and throw on timeout: the xBZZ spent, the id never saved. The caller
+ * saves the id first, then calls waitUntilUsable.
+ */
 export async function buyBatch(bee: Bee, megabytes: number, days: number, label: string): Promise<string> {
-  const id = await bee.storage.buy(Size.fromMegabytes(megabytes), Duration.fromDays(days), { label })
+  const id = await bee.storage.buy(Size.fromMegabytes(megabytes), Duration.fromDays(days), { label, waitForUsable: false })
   return id.toHex()
+}
+
+/**
+ * A new batch only becomes usable once the node has seen enough confirmations
+ * (usually 1 to 5 minutes on Gnosis). Uploading before that fails with "batch
+ * not usable". Polls GET /stamps/{id}; a 404 only means the node hasn't synced it yet.
+ */
+export async function waitUntilUsable(
+  bee: Bee,
+  batchId: string,
+  opts: { timeoutMs?: number; everyMs?: number; onWait?: (seconds: number) => void } = {},
+): Promise<StorageStatus> {
+  const timeoutMs = opts.timeoutMs ?? 15 * 60_000
+  const everyMs = opts.everyMs ?? 10_000
+  const started = Date.now()
+  for (;;) {
+    const s = await storageStatus(bee, batchId).catch(() => null)
+    if (s?.usable) return s
+    const waited = Date.now() - started
+    if (waited > timeoutMs) {
+      throw new Error(
+        `Batch ${batchId.slice(0, 12)}… is still not usable after ${Math.round(waited / 1000)} s. Its id is saved, nothing is lost: check again with "npm run cli -- storage status".`,
+      )
+    }
+    opts.onWait?.(Math.round(waited / 1000))
+    await new Promise((r) => setTimeout(r, everyMs))
+  }
+}
+
+/** What the node wallet holds, checked before anything is spent. */
+export async function walletFunds(bee: Bee): Promise<{ bzz: BZZ; xdai: string; hasGas: boolean }> {
+  const w = await bee.wallet.getBalance()
+  return { bzz: w.bzzBalance, xdai: w.nativeTokenBalance.toDecimalString(), hasGas: w.nativeTokenBalance.toWeiBigInt() > 0n }
 }
 
 /** Extends an EXISTING batch by N days (a top-up under the hood). */
