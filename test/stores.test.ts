@@ -38,7 +38,7 @@ describe('next index is read from the network', () => {
     const m = new MemoryFeedStore()
     const w = Wallet.createRandom()
     expect((await resolveNextIndex(m, w.address, topic)).next).toBe(0n)
-    await m.writeRef({ name: 'x', address: w.address, wallet: w as unknown as Wallet }, topic, 0n, 'ab'.repeat(32))
+    await m.writeRef({ name: 'x', address: w.address, wallet: w }, topic, 0n, 'ab'.repeat(32))
     expect((await resolveNextIndex(m, w.address, topic)).next).toBe(1n)
   })
 
@@ -53,7 +53,7 @@ describe('keyless HTTP reader', () => {
     const chunk = concat([getBytes(`0x${feedIdentifier(topic, 2n)}`), new Uint8Array(65), new Uint8Array(8), uint64be(1_700_000_000n), getBytes(`0x${ref}`)])
     const fetcher = async (url: string) => {
       if (url.includes('/feeds/')) return new Response(null, { status: 404 })
-      if (url.endsWith(`/chunks/${feedUpdateAddress(owner, topic, 2n)}`)) return new Response(getBytes(chunk))
+      if (url.endsWith(`/chunks/${feedUpdateAddress(owner, topic, 2n)}`)) return new Response(new Uint8Array(getBytes(chunk)))
       return new Response('nope', { status: 500 })
     }
     const http = new HttpFeedStore('http://node', fetcher)

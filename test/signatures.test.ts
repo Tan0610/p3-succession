@@ -1,14 +1,14 @@
 import { PrivateKey } from '@ethersphere/bee-js'
-import { getBytes, keccak256, Wallet } from 'ethers'
+import { getBytes, keccak256, Wallet, type BaseWallet } from 'ethers'
 import { describe, expect, it } from 'vitest'
 import { buildCharter, draftProposal } from '../src/core/operations.js'
 import { LIBRARY_IDS, type Approval, type LibraryId } from '../src/core/schemas.js'
 import { recoverSigner, requiredThreshold, signText, verifyQuorum } from '../src/core/signatures.js'
 
-const wallets = Object.fromEntries(LIBRARY_IDS.map((l) => [l, Wallet.createRandom()])) as unknown as Record<LibraryId, Wallet>
+const wallets = Object.fromEntries(LIBRARY_IDS.map((l) => [l, Wallet.createRandom()])) as unknown as Record<LibraryId, BaseWallet>
 const charter = buildCharter(Object.fromEntries(LIBRARY_IDS.map((l) => [l, wallets[l].address])) as Record<LibraryId, string>)
 const statement = 'Ladakh–Spiti test statement'
-const sealBy = async (l: LibraryId, w: Wallet = wallets[l]): Promise<Approval> => ({
+const sealBy = async (l: LibraryId, w: BaseWallet = wallets[l]): Promise<Approval> => ({
   library: l,
   address: wallets[l].address,
   signature: await signText(w, statement),
