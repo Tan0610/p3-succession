@@ -63,6 +63,19 @@ export function App() {
     }
   }, [source, rehearsal])
 
+  // ?play=all plays the whole rehearsal on arrival: handy for sharing a link to the finished story
+  useEffect(() => {
+    if (source !== 'rehearsal' || new URLSearchParams(window.location.search).get('play') !== 'all') return
+    let cancelled = false
+    void (async () => {
+      while (!rehearsal.done && !cancelled) await rehearsal.next()
+      if (!cancelled) await refreshRehearsal(rehearsal)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [source, rehearsal, refreshRehearsal])
+
   const next = async () => {
     setBusy(true)
     try {
