@@ -60,8 +60,11 @@ export function RehearsalCeremony({
   const last = steps.at(-1)
   const lastWithSeals = [...steps].reverse().find((s) => s.seals)
   const listEnd = useRef<HTMLLIElement>(null)
+  const shownBefore = useRef(steps.length)
   useEffect(() => {
-    listEnd.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    // follow the story one step at a time; don't yank the page when it's played all at once
+    if (steps.length === shownBefore.current + 1) listEnd.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    shownBefore.current = steps.length
   }, [steps.length])
 
   return (
