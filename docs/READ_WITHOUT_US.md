@@ -41,7 +41,7 @@ identifier(i) = keccak256(topic ‖ uint64_big_endian(i))
 chunk(i)      = keccak256(identifier(i) ‖ owner_address_20_bytes)
 ```
 
-- `GET $BEE/feeds/<owner>/<topic>` returns the latest index in the `swarm-feed-index` response header, or 404 if the feed is empty.
+- `GET $BEE/feeds/<owner>/<topic>` (send header `Swarm-Only-Root-Chunk: true`) returns the latest index in the `swarm-feed-index` response header. A 404 means *either* an empty feed *or* a lookup that timed out, so before concluding "empty", ask for `chunk(0)` directly. Public gateways may hide the header; then walk `chunk(0), chunk(1), …` until one is missing.
 - `GET $BEE/chunks/<chunk(i)>` returns `identifier(32) ‖ signature(65) ‖ span(8) ‖ timestamp(8) ‖ reference(32)`.
 - `GET $BEE/bzz/<reference>/` returns the registry entry JSON for update *i*.
 
