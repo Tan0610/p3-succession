@@ -11,7 +11,9 @@ The short version:
 - **The succession is performed for real, not only simulated**: `ceremony --live` runs it on a Bee node and records every signature and feed index in [HANDOFF_LOG.md](HANDOFF_LOG.md). The arrangement is written down in plain language in [STEWARDSHIP.md](STEWARDSHIP.md).
 
 <!-- lsc:status -->
-**Status:** rehearsed, not yet performed live. `npm run ceremony -- --live --yes` performs it on a Bee node and writes the evidence into `handoffs/` and [HANDOFF_LOG.md](HANDOFF_LOG.md).
+**Status:** performed live on a Bee node, not only rehearsed.
+
+- Epoch 1, 2026-09-19: Ngawang Dorje → **Padma Chodon** `0x9e9e0Cd098e4492bfC6889014d48936eE01a3720`, register update #1, evidence [handoffs/2026-09-19-epoch-1.json](handoffs/2026-09-19-epoch-1.json)
 <!-- /lsc:status -->
 
 ## Where to start reading
@@ -28,10 +30,10 @@ The public anchor:
 
 <!-- lsc:anchor -->
 ```
-registry owner (council scribe) : (made by keys init at the start of the live ceremony)
+registry owner (council scribe) : 0xB3959e06E1edE30605Ed3136C857cC57B0a64af0
 registry topic                  : lsc/registry/v1
 registry topic (hex)            : f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46967eb51c77a4b88a6d
-registry feed manifest          : (created by the first live hand-off)
+registry feed manifest          : 37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2
 catalogue topic                 : lsc/catalogue/v1  (5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f)
 corrections topic               : lsc/corrections/v1  (2cf9be53bb7408cee80ea7678ddcb7700e4ae3167670105625954316124ee633)
 postage batch (open to top-ups) : 65c1e84317fa4a5f469bd5b53180edaab7c2fc7fa5d66b4c2bbe86a749a6038c
