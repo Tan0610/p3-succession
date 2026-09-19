@@ -336,8 +336,9 @@ export function assess(facts: WatchdogFacts): Assessment {
 
   const titleBits: string[] = []
   if (broken) titleBits.push(cur ? 'storage or catalogue not confirmed' : 'catalogue not confirmed reachable')
-  if (storageAlert && facts.batch) titleBits.push(`T3 met, storage paid for ~${Math.round(facts.batch.ttlDays)} days (floor ${floor})`)
-  if (silenceAlert) titleBits.push(`steward quiet for ${quietDays} days (T2 mark ${silenceDays})`)
+  // the title names the findings, not today's numbers, so a daily re-check only comments when the findings change
+  if (storageAlert) titleBits.push(`T3 met, storage paid for less than the ${floor}-day floor`)
+  if (silenceAlert) titleBits.push(`steward quiet past the ${silenceDays}-day T2 mark`)
   const title = titleBits.length ? `Stewardship alert: ${titleBits.join('; ')}` : 'Stewardship: all clear'
 
   return { facts, exitCode, status, title, headline, checks, triggers, quietDays, storageAlert, silenceAlert }
