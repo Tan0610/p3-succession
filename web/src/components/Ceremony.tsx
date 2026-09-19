@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { RehearsalStep } from '../../../src/core/rehearsal'
 import type { LibraryId } from '../../../src/core/schemas'
 import type { HandoffRecordLite } from '../data'
@@ -13,25 +13,53 @@ const ACT_TITLE: Record<RehearsalStep['act'], string> = {
   after: 'And the one after that',
 }
 
-/** Seven seal slots. A seal stamps in when its library signs. */
+/**
+ * Seven seal slots. The seals stamp in one after another the first time the
+ * row scrolls into view; a seal added later (in the rehearsal) stamps at once.
+ */
 export function SealRow({ sealed, needed }: { sealed: LibraryId[]; needed: number }) {
+  const row = useRef<HTMLDivElement>(null)
+  const [firstBatch, setFirstBatch] = useState<LibraryId[] | null>(null)
+  useEffect(() => {
+    if (firstBatch) return
+    const el = row.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      queueMicrotask(() => setFirstBatch(sealed))
+      return
+    }
+    const io = new IntersectionObserver(
+      (seen) => {
+        if (seen.some((s) => s.isIntersecting)) {
+          setFirstBatch(sealed)
+          io.disconnect()
+        }
+      },
+      { threshold: 0.6 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [firstBatch, sealed])
+
+  const shown = firstBatch ? sealed : []
   return (
     <>
-      <div className="seal-row" role="list" aria-label={`${sealed.length} of ${needed} needed seals`}>
+      <div ref={row} className={`seal-row${firstBatch ? ' seen' : ''}`} role="list" aria-label={`${sealed.length} of ${needed} needed seals`}>
         {LIB_ORDER.map((id) => {
-          const on = sealed.includes(id)
+          const on = shown.includes(id)
+          const order = firstBatch?.indexOf(id) ?? -1
+          const style = { ...libStyle(id), '--delay': `${order > 0 ? order * 260 : 0}ms` } as CSSProperties
           return (
-            <div key={id} role="listitem" className={`slot${on ? ' sealed' : ''}`} style={libStyle(id)}>
+            <div key={id} role="listitem" className={`slot${on ? ' sealed' : ''}`} style={style}>
               <span className="ring" aria-hidden="true">
                 {on ? '༄' : ''}
               </span>
               <span className="name">{LIB[id].name}</span>
-              <span className="sr-only">{on ? 'sealed' : 'not sealed'}</span>
+              <span className="sr-only">{sealed.includes(id) ? 'sealed' : 'not sealed'}</span>
             </div>
           )
         })}
       </div>
-      <p className="tally" aria-live="polite">
+      <p className="tally" aria-live="polite" style={{ '--n': firstBatch?.length ?? 0 } as CSSProperties}>
         {sealed.length >= needed
           ? `${sealed.length} seals: enough.`
           : sealed.length === 0
@@ -153,12 +181,10 @@ export function RecordedCeremony({ records }: { records: HandoffRecordLite[] }) 
           <li key={r.epoch}>
             <span className="act">Epoch {r.epoch}</span>
             {r.rejectedAttempts.map((a, i) => (
-              <div key={i} style={{ marginBottom: '0.8rem' }}>
-                <h3 style={{ textDecoration: 'line-through', textDecorationColor: 'var(--flag-red)' }}>
+              <div key={i} className="refused-attempt">
+                <h3>
                   {a.attempt}
-                  <span className="refusal" style={{ fontFamily: 'var(--hand)', color: 'var(--flag-red)', marginLeft: '0.4rem' }}>
-                    refused
-                  </span>
+                  <span className="refusal">refused</span>
                 </h3>
                 <p>{a.result}</p>
               </div>

@@ -5,14 +5,14 @@ import type { People } from '../data'
 import { Hex, LIB, LIB_ORDER, libStyle } from './bits'
 
 /** Rough relative positions. Not to scale: a doodle, not a survey. */
-const PINS: Record<LibraryId, { x: number; y: number; dx: number; dy: number }> = {
-  diskit: { x: 330, y: 70, dx: 14, dy: -6 },
-  lamayuru: { x: 118, y: 196, dx: -8, dy: 26 },
-  alchi: { x: 212, y: 190, dx: -10, dy: -16 },
-  thiksey: { x: 348, y: 196, dx: 14, dy: -8 },
-  hemis: { x: 384, y: 236, dx: 14, dy: 18 },
-  kye: { x: 520, y: 430, dx: -52, dy: -10 },
-  tabo: { x: 596, y: 480, dx: 14, dy: 6 },
+const PINS: Record<LibraryId, { x: number; y: number; dx: number; dy: number; anchor: 'start' | 'middle' | 'end' }> = {
+  diskit: { x: 330, y: 70, dx: 18, dy: 6, anchor: 'start' },
+  lamayuru: { x: 118, y: 196, dx: 0, dy: 34, anchor: 'middle' },
+  alchi: { x: 212, y: 190, dx: 0, dy: -20, anchor: 'middle' },
+  thiksey: { x: 348, y: 196, dx: 16, dy: -12, anchor: 'start' },
+  hemis: { x: 384, y: 236, dx: 18, dy: 20, anchor: 'start' },
+  kye: { x: 520, y: 430, dx: -18, dy: 6, anchor: 'end' },
+  tabo: { x: 596, y: 480, dx: -22, dy: 24, anchor: 'end' },
 }
 
 export function LibraryMap({ view, people }: { view: CatalogueView; people: People }) {
@@ -35,19 +35,19 @@ export function LibraryMap({ view, people }: { view: CatalogueView; people: Peop
           <path d="M300 30 C 320 60, 312 80, 336 100 S 352 150, 368 170" fill="none" stroke="#2b5fae" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
           {/* the Spiti river */}
           <path d="M470 380 C 510 400, 540 440, 580 470 S 630 500, 660 520" fill="none" stroke="#2b5fae" strokeWidth="2.6" strokeLinecap="round" opacity="0.5" />
-          <text x="52" y="272" fontFamily="var(--hand)" fontSize="16" fill="#2b5fae">
+          <text className="river" x="52" y="272" fontFamily="var(--hand)" fontSize="16" fill="#2b5fae">
             Indus
           </text>
-          <text x="600" y="512" fontFamily="var(--hand)" fontSize="15" fill="#2b5fae">
+          <text className="river" x="610" y="520" fontFamily="var(--hand)" fontSize="15" fill="#2b5fae">
             Spiti
           </text>
-          <text x="40" y="40" fontFamily="var(--hand)" fontSize="22" fill="#1e2b35">
+          <text className="region" x="40" y="44" fontFamily="var(--hand)" fontSize="22" fill="#1e2b35">
             Ladakh
           </text>
-          <text x="470" y="360" fontFamily="var(--hand)" fontSize="22" fill="#1e2b35">
+          <text className="region" x="470" y="360" fontFamily="var(--hand)" fontSize="22" fill="#1e2b35">
             Spiti valley
           </text>
-          <text x="40" y="520" fontFamily="var(--hand)" fontSize="14" fill="#4f5d67">
+          <text className="note" x="40" y="520" fontFamily="var(--hand)" fontSize="14" fill="#4f5d67">
             not to scale, and not a survey
           </text>
           {/* dotted track from Ladakh down to Spiti */}
@@ -73,7 +73,8 @@ export function LibraryMap({ view, people }: { view: CatalogueView; people: Peop
               >
                 <circle className="halo" cx={p.x} cy={p.y} r={picked === id ? 17 : 13} fill="#f8f9f5" stroke="transparent" />
                 <circle cx={p.x} cy={p.y} r={picked === id ? 11 : 8} fill={LIB[id].color} />
-                <text x={p.x + p.dx} y={p.y + p.dy} fontSize="17" fontWeight="700" fill={LIB[id].color} fontFamily="var(--body)">
+                <circle className="hit" cx={p.x} cy={p.y} r={26} fill="transparent" />
+                <text className="lbl" x={p.x + p.dx} y={p.y + p.dy} textAnchor={p.anchor} fontSize="17" fontWeight="700" fill={LIB[id].color} fontFamily="var(--body)">
                   {LIB[id].name}
                 </text>
               </g>
