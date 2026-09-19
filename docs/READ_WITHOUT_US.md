@@ -30,6 +30,10 @@ curl $BEE/bzz/<entry.catalogueManifest>/                   # a plain HTML page, 
 curl $BEE/bzz/<entry.catalogueManifest>/catalogue.csv      # for spreadsheets
 ```
 
+<!-- lsc:curl -->
+_The same two commands with the real references appear here once they exist: the registry feed manifest is (created by the first live hand-off)._
+<!-- /lsc:curl -->
+
 This shows the **latest** registry entry. A careful reader also checks its seals (step 3), because the scribe could write an entry without them. Readers are expected to ignore such an entry and fall back to the previous valid one.
 
 ## 2. Careful: walk the registry yourself

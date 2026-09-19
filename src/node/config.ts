@@ -201,6 +201,24 @@ export function renderAnchorBlock(c: StewardshipConfig): string {
   ].join('\n')
 }
 
+/** The two curls from READ_WITHOUT_US with the real references in them, once they exist. */
+export function renderCurlBlock(c: StewardshipConfig): string {
+  const current = c.currentSteward ? c.stewards.find((s) => sameAddress(s.address, c.currentSteward)) : undefined
+  const catalogue = c.currentSteward ? c.catalogueManifests[c.currentSteward] : undefined
+  if (!c.registryManifest || !current || !catalogue) {
+    return `_The same two commands with the real references appear here once they exist: the registry feed manifest is ${PENDING_REGISTRY}._`
+  }
+  return [
+    'With the references filled in (copy and paste):',
+    '',
+    '```sh',
+    `BEE=${c.bee.url}            # or https://api.gateway.ethswarm.org, or any Bee node`,
+    `curl $BEE/bzz/${c.registryManifest}/                 # never changes`,
+    `curl $BEE/bzz/${catalogue}/catalogue.json   # ${current.name}'s feed; the entry above names it`,
+    '```',
+  ].join('\n')
+}
+
 /** One line for the README: has a real hand-off happened yet, and where is the proof. */
 export function renderStatusBlock(c: StewardshipConfig): string {
   const handoffs = c.history.filter((h) => h.epoch > 0)
@@ -226,6 +244,7 @@ export function renderDocs(text: string, config: StewardshipConfig): string {
   out = block('identities', renderIdentitiesBlock(config), out)
   out = block('anchor', renderAnchorBlock(config), out)
   out = block('status', renderStatusBlock(config), out)
+  out = block('curl', renderCurlBlock(config), out)
   return out
 }
 

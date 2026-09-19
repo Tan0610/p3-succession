@@ -9,6 +9,7 @@ import {
   loadConfig,
   PENDING_MARKERS,
   renderAnchorBlock,
+  renderCurlBlock,
   renderDocs,
   renderIdentitiesBlock,
   renderStatusBlock,
@@ -44,6 +45,9 @@ describe('STEWARDSHIP.md', () => {
     expect(successor).toContain(`Stanzin Namgyal, key \`${live.designatedSuccessor}\``)
     for (const t of ['T1', 'T2', 'T3', 'T4', '60 days', '4 of the 7']) expect(successor).toContain(t)
     expect(renderStatusBlock(live)).toContain('handoffs/2026-09-20-epoch-1.json')
+    // a stranger gets copy-paste commands for the registry and the current steward's catalogue
+    expect(renderCurlBlock(live)).toContain(`/bzz/${live.registryManifest}/`)
+    expect(renderCurlBlock(live)).toContain(`/bzz/${'34'.repeat(32)}/catalogue.json`)
   })
 
   it('after the live ceremony no placeholder is left anywhere in the tracked documents', () => {
@@ -146,6 +150,7 @@ function liveConfig(): StewardshipConfig {
   const [ngawang, padma, stanzin] = c.stewards
   c.currentSteward = padma!.address
   c.designatedSuccessor = stanzin!.address
+  c.catalogueManifests = { [ngawang!.address!]: '12'.repeat(32), [padma!.address!]: '34'.repeat(32) }
   c.history = [
     { epoch: 0, steward: ngawang!.address!, stewardName: ngawang!.name, registryFeedIndex: 0, entryReference: 'ef'.repeat(32), record: 'handoffs/2026-09-20-epoch-0.json', at: '2026-09-20T10:00:00.000Z' },
     { epoch: 1, steward: padma!.address!, stewardName: padma!.name, registryFeedIndex: 1, entryReference: 'fe'.repeat(32), record: 'handoffs/2026-09-20-epoch-1.json', at: '2026-09-20T10:30:00.000Z' },
