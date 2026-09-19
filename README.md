@@ -70,7 +70,7 @@ npm run verify:handoff -- handoffs/<date>-epoch-1.json    # re-check the evidenc
 npm run audit:secrets
 ```
 
-The live ceremony checks the batch is usable and the wallet can pay before it writes anything. It is resumable: each stage checks the network and is skipped if it already happened, and a hand-off whose evidence file was not written (run cut off) is rebuilt from the registry on the network. `--incoming` takes a steward key name or a 0x address (default `steward-padma`, or `LSC_INCOMING`). Or do every step by hand:
+What it spends, at September 2026 prices: about 0.65 xBZZ for the batch and 0.05 xBZZ for the one-day extension (`--extend-days N` to change it). Everything else is stamped against the batch already bought. The live ceremony checks the batch is usable and the wallet can pay before it writes anything. It is resumable: each stage checks the network and is skipped if it already happened, and a hand-off whose evidence file was not written (run cut off) is rebuilt from the registry on the network. `--incoming` takes a steward key name or a 0x address (default `steward-padma`, or `LSC_INCOMING`). Or do every step by hand:
 
 ```sh
 npm run cli -- keys init                                  # private keys → .secrets/ (git-ignored), addresses → config
@@ -80,7 +80,7 @@ npm run cli -- succession accept --epoch 1 --as steward-padma
 npm run cli -- succession handoff --epoch 1 --incoming 0x…
 npm run cli -- catalogue publish --as steward-padma
 npm run cli -- correction submit --as tabo --record TABO-0003 --set condition=damaged --note "water stain"
-npm run cli -- storage extend --days 7 --yes              # or: storage topup --bzz 0.1 --yes
+npm run cli -- storage extend --days 1 --yes              # or: storage topup --bzz 0.1 --yes
 npm run cli -- succession check-trigger --unanswered 2
 ```
 
