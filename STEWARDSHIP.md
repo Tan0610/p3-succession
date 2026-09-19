@@ -48,17 +48,17 @@ The public addresses for every role are listed here and in `stewardship.config.j
 | Role | Who | Address (public) |
 |---|---|---|
 | Payer (storage custodian) | the shared Bee node's wallet | `0x9452a51F8b43239b8572C08253E4b7ECAf339cb8` |
-| Council scribe (owns the registry feed) | held by the council secretary | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Steward key | Ngawang Dorje (hemis) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Steward key | Padma Chodon (tabo) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Steward key | Stanzin Namgyal (thiksey) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Library committee key | Diskit library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Library committee key | Thiksey library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Library committee key | Hemis library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Library committee key | Alchi library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Library committee key | Lamayuru library committee (Ladakh) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Library committee key | Kye library committee (Spiti) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
-| Library committee key | Tabo library committee (Spiti) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
+| Council scribe (owns the registry feed) | held by the council secretary | `0xB3959e06E1edE30605Ed3136C857cC57B0a64af0` |
+| Steward key | Ngawang Dorje (hemis) | `0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99` |
+| Steward key | Padma Chodon (tabo) | `0x9e9e0Cd098e4492bfC6889014d48936eE01a3720` |
+| Steward key | Stanzin Namgyal (thiksey) | `0x906039f8366F9Ef6E44A172a006bE21B66dE7C63` |
+| Library committee key | Diskit library committee (Ladakh) | `0x0b6409c83d6CF1874FB307F3CA21A4224e18FFB6` |
+| Library committee key | Thiksey library committee (Ladakh) | `0x9D1298BE49EdcE997464464D50F8251C9A53D4AF` |
+| Library committee key | Hemis library committee (Ladakh) | `0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87` |
+| Library committee key | Alchi library committee (Ladakh) | `0xAE823252730c6dB4a1bdE010Dddc5220ED733875` |
+| Library committee key | Lamayuru library committee (Ladakh) | `0x536f2dd5E150cB087e1F46dAd444e037C27959aD` |
+| Library committee key | Kye library committee (Spiti) | `0x91A4935D87166e09fb27d01d946B1Cf61dc87Cc4` |
+| Library committee key | Tabo library committee (Spiti) | `0x42DAF750ea05e3D9dd39D1213C7d29E0B20e3ae7` |
 <!-- /lsc:identities -->
 
 ## 3. Who comes next
@@ -66,13 +66,11 @@ The public addresses for every role are listed here and in `stewardship.config.j
 Every steward, when they accept the role, names the person they would like to follow them. They sign this with their own key while they are still able to. It is their **standing designation**, and it stays on record even if they later become unreachable.
 
 <!-- lsc:successor -->
-**Status: planned, not yet in force.** The live ceremony has not run yet, so nobody has signed anything.
+**Current steward:** Padma Chodon, key `0x9e9e0Cd098e4492bfC6889014d48936eE01a3720` (since epoch 1, 2026-09-19; register update #1; evidence in [handoffs/2026-09-19-epoch-1.json](handoffs/2026-09-19-epoch-1.json))
 
-**First steward:** Ngawang Dorje, key _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_
+**Designated successor:** Stanzin Namgyal, key `0x906039f8366F9Ef6E44A172a006bE21B66dE7C63`. Padma Chodon named Stanzin Namgyal in the acceptance they signed with their own key when they took over.
 
-**Designated successor:** Padma Chodon, key _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_. This becomes binding when Ngawang Dorje signs the genesis statement that names them.
-
-**When the successor takes over:** when any trigger in §4 is met (T1 they step down; T2 no catalogue update for 60 days and two libraries unanswered for 30; T3 under 30 days of storage left; T4 five of the seven libraries ask for removal), with 4 of the 7 library seals.
+**When Stanzin Namgyal takes over:** as soon as any trigger in §4 is met (T1 they step down; T2 no catalogue update for 60 days and two libraries unanswered for 30; T3 under 30 days of storage left; T4 five of the seven libraries ask for removal). Handing over to Stanzin Namgyal needs 4 of the 7 library seals; handing over to anyone else needs 5 of 7. Padma Chodon's own key is not needed.
 <!-- /lsc:successor -->
 
 Why the difference between 4 and 5 seals: choosing the person the outgoing steward named respects their wish, so a simple majority of libraries is enough. Choosing someone else overrides that wish, so it needs a larger majority.
@@ -145,10 +143,10 @@ This agreement may be changed with the seals of **5 of the 7** libraries. The ch
 
 <!-- lsc:anchor -->
 ```
-registry owner (council scribe) : (made by keys init at the start of the live ceremony)
+registry owner (council scribe) : 0xB3959e06E1edE30605Ed3136C857cC57B0a64af0
 registry topic                  : lsc/registry/v1
 registry topic (hex)            : f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46967eb51c77a4b88a6d
-registry feed manifest          : (created by the first live hand-off)
+registry feed manifest          : 37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2
 catalogue topic                 : lsc/catalogue/v1  (5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f)
 corrections topic               : lsc/corrections/v1  (2cf9be53bb7408cee80ea7678ddcb7700e4ae3167670105625954316124ee633)
 postage batch (open to top-ups) : 65c1e84317fa4a5f469bd5b53180edaab7c2fc7fa5d66b4c2bbe86a749a6038c
