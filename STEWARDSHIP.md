@@ -86,7 +86,7 @@ Any library may start a hand-off when **one** of these is true:
 - **T3: The storage is running out.** Less than **30 days** of paid storage remain and nobody has topped it up. (Any library may top it up first; see §7.)
 - **T4: Removal for cause.** Five of the seven libraries ask for it.
 
-The software can check T2 and T3 against the network (`npm run cli -- succession check-trigger`). A trigger only opens the door: the hand-off still needs the seals.
+The software can check T2 and T3 against the network (`npm run cli -- succession check-trigger`), and a robot checks them every day in public (see "The daily watchdog" in §7). A trigger only opens the door: the hand-off still needs the seals.
 
 ## 5. How a hand-off happens
 
@@ -117,6 +117,20 @@ Swarm storage is **rent paid in advance, not a purchase**. A postage batch lasts
 - The storage is checked **at least once a month** (`npm run cli -- storage status`), and every extension is written in `STORAGE_LOG.md`.
 - **Anyone may add to the rent.** Topping up an existing batch is open to anyone on the Gnosis Chain, not only its owner. Any library, donor or well-wisher with xBZZ can extend the storage without asking permission, and without the steward or the node's operator being reachable. All they need is the batch number, printed as "postage batch" in §10. The two commands are in [`docs/MECHANISMS.md`](docs/MECHANISMS.md#topping-up-from-your-own-wallet-no-node-no-permission).
 - If the storage falls below 30 days, that is trigger T3, whether or not the steward is active.
+
+### The daily watchdog
+
+A robot checks every day and raises its hand in public if the lamp is running low or the steward goes quiet.
+
+Every morning a small program run by GitHub (`npm run watchdog`, [`.github/workflows/steward-watchdog.yml`](.github/workflows/steward-watchdog.yml)) reads the register, the steward's latest catalogue and the storage balance through a public Swarm gateway. It uses no keys and no node of ours, and it cannot change or pay for anything. It asks three questions:
+
+- **Can readers still reach the catalogue?** It follows the register to the current steward, checking the seals as any reader would.
+- **Is the rent still paid?** It reads how many days the postage batch has left. Under 30 days is trigger **T3**.
+- **Is the steward still publishing?** It counts the days since the last catalogue update. At 60 days it raises the alarm for trigger **T2**. T2 itself is met once two libraries confirm that their written requests went unanswered, which the robot cannot see.
+
+When something needs doing, it opens **one** public notice (a GitHub issue titled "Stewardship alert: …"), or updates the one already open. The notice says in plain words what it found, gives the commands any library can use to add rent without asking anyone (§7), and points to how a hand-off happens (§5). When everything is clear again, it closes the notice. Anyone can ask the same questions from their own computer with `npm run watchdog`.
+
+The robot only *raises its hand*. It cannot top up the storage or change the steward: people do that, as described above.
 
 ## 8. What this arrangement cannot protect against
 
