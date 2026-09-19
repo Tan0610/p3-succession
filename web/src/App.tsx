@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Hex } from './components/bits'
-import { Catalogue } from './components/Catalogue'
+import { Catalogue, ShelfSkeleton } from './components/Catalogue'
 import { RecordedCeremony, RehearsalCeremony } from './components/Ceremony'
 import { FlagNav } from './components/FlagNav'
 import { Lamp } from './components/Lamp'
 import { LibraryMap } from './components/LibraryMap'
-import { Lineage } from './components/Lineage'
+import { Lineage, LineageSkeleton } from './components/Lineage'
 import { SourceSwitch } from './components/SourceSwitch'
+import { StorySoFar } from './components/StorySoFar'
 import { WhoHolds } from './components/WhoHolds'
 import { config, configuredPeople, ledger, loadFromNetwork, NotYetError, recordedStorage, records, Rehearsal, type Snapshot, type Source } from './data'
 import type { RehearsalStep } from '../../src/core/rehearsal'
@@ -102,6 +103,8 @@ export function App() {
 
   const current = snap?.view.registry.current?.entry ?? null
   const scribe = snap?.view.anchor.registryOwner ?? config.council.scribe.address
+  const storage = snap?.storage ?? (source === 'rehearsal' ? null : recordedStorage())
+  const loading = !snap && !error
 
   return (
     <>
@@ -120,6 +123,7 @@ export function App() {
       <FlagNav chapters={CHAPTERS} />
 
       <main id="main">
+        {!error && <StorySoFar view={snap?.view ?? null} storage={storage} loading={loading} rehearsal={source === 'rehearsal'} />}
         <section id="lineage" className="hero" aria-labelledby="hero-title">
           <div>
             <h1 id="hero-title">
@@ -163,7 +167,7 @@ export function App() {
               </p>
             )}
           </div>
-          {snap ? <Lineage view={snap.view} /> : !error && <p className="loading">Reading the register…</p>}
+          {snap ? <Lineage view={snap.view} /> : !error && <LineageSkeleton source={source} />}
         </section>
 
         <section id="ceremony" className="chapter" aria-labelledby="ceremony-title">
@@ -189,7 +193,13 @@ export function App() {
               correction it shows up here straight away. Nobody has to email anyone.
             </p>
           </div>
-          {snap ? <Catalogue view={snap.view} /> : <p className="loading">{error ? 'Nothing to show yet.' : 'Unrolling the folios…'}</p>}
+          {snap ? (
+            <Catalogue view={snap.view} />
+          ) : error ? (
+            <p className="loading">Nothing to show until the register can be read. Try another source at the top of the page.</p>
+          ) : (
+            <ShelfSkeleton />
+          )}
         </section>
 
         <section id="lamp" className="chapter" aria-labelledby="lamp-title">
@@ -197,7 +207,7 @@ export function App() {
             <h2 id="lamp-title">Keeping the lamp lit</h2>
             <p className="lede">The storage is paid by the node’s wallet, which is a different key from anyone who publishes or decides.</p>
           </div>
-          <Lamp storage={snap?.storage ?? (source === 'rehearsal' ? null : recordedStorage())} ledger={source === 'rehearsal' ? [] : ledger} />
+          <Lamp storage={storage} ledger={source === 'rehearsal' ? [] : ledger} />
         </section>
 
         <section id="libraries" className="chapter" aria-labelledby="libraries-title">
@@ -205,7 +215,7 @@ export function App() {
             <h2 id="libraries-title">Seven libraries, seven seals</h2>
             <p className="lede">Each committee holds one key. It seals hand-offs, and it corrects its own shelves without asking anyone.</p>
           </div>
-          {snap && <LibraryMap view={snap.view} people={snap.people} />}
+          {snap ? <LibraryMap view={snap.view} people={snap.people} /> : !error && <p className="loading-note hand">Pinning the seven libraries on the map…</p>}
         </section>
 
         <section id="holds" className="chapter" aria-labelledby="holds-title">

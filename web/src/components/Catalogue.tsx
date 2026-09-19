@@ -132,3 +132,25 @@ export function Catalogue({ view }: { view: CatalogueView }) {
     </div>
   )
 }
+
+/** Blank leaves on the shelf while the catalogue is read. */
+export function ShelfSkeleton() {
+  return (
+    <div aria-busy="true">
+      <p className="loading-note hand" role="status">
+        Unrolling the folios…
+      </p>
+      <ul className="shelf" aria-hidden="true">
+        {[0, 1, 2, 3].map((k) => (
+          <li key={k} className="folio ghost">
+            <div>
+              <span className="ghost-line short" />
+              <span className="ghost-line" />
+            </div>
+            <span className="ghost-line leaf" />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

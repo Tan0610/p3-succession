@@ -21,7 +21,7 @@
   --flag-yellow: #e7b52c;
 
   --lib-diskit: #2b4c9b;
-  --lib-thiksey: #b87812;
+  --lib-thiksey: #9a6309; /* darker than the ochre it was, so the name passes AA on the page */
   --lib-hemis: #8c2332;
   --lib-alchi: #2f7d5b;
   --lib-lamayuru: #7d6440;
@@ -77,6 +77,7 @@ body {
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
@@ -1159,4 +1160,316 @@ footer {
     position: sticky;
     top: 6rem;
   }
+}
+
+/* ── the story so far: one slip with the four facts that matter first ─── */
+.slip {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, 1fr));
+  margin: 1.4rem 0 0;
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 6px 16px 8px 14px;
+  box-shadow: 4px 4px 0 var(--wash-deep), 4px 4px 0 1.5px var(--ink);
+}
+.slip .cell {
+  display: grid;
+  align-content: start;
+  gap: 0.1rem;
+  padding: 0.8rem 1.1rem 0.85rem;
+  min-width: 0;
+}
+.slip .cell + .cell {
+  border-left: 2px dashed var(--rule);
+}
+.slip .keeper-cell {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+}
+.slip .keeper-cell > div {
+  display: grid;
+  gap: 0.1rem;
+}
+.slip .seal {
+  flex: none;
+  filter: drop-shadow(1px 1px 0 rgba(30, 43, 53, 0.18));
+}
+.slip .label {
+  font-family: var(--hand);
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--maroon);
+}
+.slip .value {
+  font-size: var(--step-1);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.slip .aside {
+  font-size: var(--step--1);
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+.slip .aside .dots {
+  margin: 0 0.3rem 0 0;
+  vertical-align: -0.05em;
+}
+.slip .cell.low .value {
+  color: var(--flag-red);
+}
+.slip .cell.low .aside {
+  color: color-mix(in srgb, var(--flag-red) 80%, var(--ink));
+}
+@media (max-width: 860px) {
+  .slip {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .slip .keeper-cell {
+    grid-column: 1 / -1;
+    border-bottom: 2px dashed var(--rule);
+  }
+  .slip .cell + .cell {
+    border-left: 0;
+  }
+  .slip .cell:nth-child(3) {
+    border-left: 2px dashed var(--rule);
+  }
+  .slip .cell:nth-child(4) {
+    grid-column: 1 / -1;
+    border-top: 2px dashed var(--rule);
+  }
+}
+@media (max-width: 720px) {
+  .slip .cell {
+    padding: 0.7rem 0.85rem 0.75rem;
+  }
+  .slip .value {
+    font-size: 1.15rem;
+  }
+}
+
+/* ── waiting: ghost shapes that breathe while the network answers ────── */
+.ghost-seal,
+.ghost-line {
+  display: block;
+  animation: breathe 1.8s ease-in-out infinite;
+}
+.ghost-seal {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  border: 2px dashed var(--rule);
+}
+.ghost-line {
+  height: 0.9rem;
+  width: 10rem;
+  max-width: 100%;
+  margin-top: 0.35rem;
+  border-radius: 999px;
+  background: var(--wash-deep);
+}
+.ghost-line.short {
+  width: 6rem;
+}
+@keyframes breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+.keeper.ghost .ghost-seal {
+  width: 5.2rem;
+  height: 5.2rem;
+}
+.keeper.ghost:nth-child(2) .ghost-seal,
+.keeper.ghost:nth-child(2) .ghost-line {
+  animation-delay: 0.3s;
+}
+.folio.ghost {
+  border-left-color: var(--rule);
+  min-height: 7.5rem;
+}
+.folio.ghost .ghost-line.leaf {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 0.5rem;
+}
+.loading-note {
+  font-size: 1.2rem;
+  color: var(--ink-soft);
+  margin-bottom: 1rem;
+}
+
+/* ── lineage: the path draws down, then each keeper's seal stamps in ──── */
+.lineage-caption {
+  font-size: 1.1rem;
+  color: var(--maroon);
+  margin: 0 0 1rem;
+  max-width: 28rem;
+}
+.lineage.is-loading .lineage-caption {
+  color: var(--ink-soft);
+}
+.lineage .path {
+  top: calc(2.4rem + 2.45rem);
+  height: calc(100% - 4.4rem - 2.45rem);
+}
+.lineage ol {
+  gap: 1.7rem;
+}
+.lineage.drawn .path {
+  animation: draw-down 1.3s ease-in-out 0.2s both;
+}
+@keyframes draw-down {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.lineage.drawn .keeper {
+  animation: keeper-in 0.5s ease-out both;
+  animation-delay: calc(var(--k, 0) * 0.55s + 0.1s);
+}
+.lineage.drawn .keeper .seal {
+  animation: stamp 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  animation-delay: calc(var(--k, 0) * 0.55s + 0.1s);
+}
+@keyframes keeper-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.lineage.drawn .keeper.ignored {
+  animation-name: keeper-in-faded;
+}
+@keyframes keeper-in-faded {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.72;
+  }
+}
+
+/* ── seals stamp in one after another, then the tally is written ───────── */
+.slot.sealed .ring {
+  animation-delay: var(--delay, 0ms);
+}
+.seal-row:not(.seen) + .tally {
+  visibility: hidden;
+}
+.seal-row.seen + .tally {
+  animation: arrive 0.35s ease-out both;
+  animation-delay: calc(var(--n, 0) * 260ms + 250ms);
+}
+
+/* refused attempts on the recorded hand-off: struck through, in red ink */
+.refused-attempt {
+  position: relative;
+  margin-bottom: 0.9rem;
+}
+.refused-attempt::before {
+  content: '';
+  position: absolute;
+  left: -2.02rem;
+  top: 0.35rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--flag-red);
+  border: 3px solid var(--flag-red);
+}
+.refused-attempt h3 {
+  text-decoration: line-through;
+  text-decoration-color: var(--flag-red);
+  text-decoration-thickness: 2px;
+}
+.refused-attempt p {
+  color: var(--ink-soft);
+}
+
+/* ── map labels stay legible over rivers and ridges, and on a phone ───── */
+.map svg text {
+  paint-order: stroke;
+  stroke: var(--card);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+.map .pin:hover text.lbl {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+@media (max-width: 720px) {
+  .map svg text.lbl {
+    font-size: 30px;
+  }
+  .map svg text.region {
+    font-size: 34px;
+  }
+  .map svg text.river {
+    font-size: 26px;
+  }
+  .map svg text.note {
+    font-size: 22px;
+  }
+  .map svg text {
+    stroke-width: 7px;
+  }
+}
+
+/* ── the lamp's warning, pinned on like a note ─────────────────────────── */
+.warn-note {
+  margin-top: 1rem;
+  padding: 0.55rem 0.85rem;
+  max-width: 34rem;
+  font-family: var(--hand);
+  font-size: 1.1rem;
+  line-height: 1.3;
+  color: var(--flag-red);
+  background: #fdf1ea;
+  border-left: 4px solid var(--flag-red);
+  transform: rotate(-0.6deg);
+  box-shadow: 2px 3px 0 rgba(30, 43, 53, 0.12);
+}
+
+/* ── buttons and chips: one set of states everywhere ───────────────────── */
+.btn[disabled],
+.btn.primary[disabled] {
+  opacity: 1;
+  background: transparent;
+  color: var(--ink-soft);
+  border-color: var(--ink-soft);
+  border-style: dashed;
+  box-shadow: none;
+}
+.btn:focus-visible,
+.chip:focus-visible,
+.copy:focus-visible {
+  outline: 3px solid var(--flag-blue);
+  outline-offset: 3px;
+}
+.chip {
+  transition: background-color 0.15s ease;
+}
+.chip:hover:not([aria-pressed='true']) {
+  background: color-mix(in srgb, var(--c, var(--ink)) 10%, transparent);
+}
+
+@media (max-width: 720px) {
+  /* less chrome above the story on a phone */
+  .masthead {
+    padding-top: 0.8rem;
+    gap: 0.7rem 1rem;
+  }
+  .wordmark {
+    font-size: 1.08rem;
+  }
+}
+
+.nowrap {
+  white-space: nowrap;
 }
