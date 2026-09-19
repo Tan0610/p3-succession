@@ -94,7 +94,8 @@ export const configuredPeople = (): People => ({
 
 export class NotYetError extends Error {}
 
-function recordedStorage(): StorageInfo | null {
+/** The last payment in ledger/storage.json: what we know about the rent without asking any node. */
+export function recordedStorage(): StorageInfo | null {
   const last = [...ledger].reverse().find((l) => l.expiresAfter)
   if (!last?.expiresAfter) return null
   const ttlDays = Math.max(0, (Date.parse(last.expiresAfter) - Date.now()) / 86_400_000)

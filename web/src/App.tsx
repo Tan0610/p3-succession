@@ -8,7 +8,7 @@ import { LibraryMap } from './components/LibraryMap'
 import { Lineage } from './components/Lineage'
 import { SourceSwitch } from './components/SourceSwitch'
 import { WhoHolds } from './components/WhoHolds'
-import { config, ledger, loadFromNetwork, NotYetError, records, Rehearsal, type Snapshot, type Source } from './data'
+import { config, configuredPeople, ledger, loadFromNetwork, NotYetError, recordedStorage, records, Rehearsal, type Snapshot, type Source } from './data'
 import type { RehearsalStep } from '../../src/core/rehearsal'
 import { TOPICS } from '../../src/core/swarm'
 
@@ -197,7 +197,7 @@ export function App() {
             <h2 id="lamp-title">Keeping the lamp lit</h2>
             <p className="lede">The storage is paid by the node’s wallet, which is a different key from anyone who publishes or decides.</p>
           </div>
-          <Lamp storage={snap?.storage ?? null} ledger={source === 'rehearsal' ? [] : ledger} />
+          <Lamp storage={snap?.storage ?? (source === 'rehearsal' ? null : recordedStorage())} ledger={source === 'rehearsal' ? [] : ledger} />
         </section>
 
         <section id="libraries" className="chapter" aria-labelledby="libraries-title">
@@ -215,7 +215,7 @@ export function App() {
               Paying, publishing and deciding are three different keys. The tools refuse to start if any two of them are the same.
             </p>
           </div>
-          <WhoHolds people={snap?.people ?? { scribe: null, payer: null, stewards: [], libraries: [] }} steward={current?.steward.address ?? null} />
+          <WhoHolds people={snap?.people ?? (source === 'rehearsal' ? { scribe: null, payer: null, stewards: [], libraries: [] } : configuredPeople())} steward={current?.steward.address ?? null} />
         </section>
       </main>
 
