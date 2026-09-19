@@ -3,62 +3,84 @@
     "url": "http://localhost:1633"
   },
   "catalogueId": "ladakh-spiti-manuscripts",
-  "catalogueManifests": {},
+  "catalogueManifests": {
+    "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99": "922c102624e35c04c87b580f0f44087ea459e90fad20363fa1596441d888668b",
+    "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720": "f612ba148b7fbd9dfa4126d6876963b7c02207884b385f732256441dd214d2fc"
+  },
   "council": {
     "scribe": {
-      "address": null,
+      "address": "0xB3959e06E1edE30605Ed3136C857cC57B0a64af0",
       "keyName": "council-scribe",
       "name": "Council scribe"
     }
   },
-  "currentSteward": null,
-  "designatedSuccessor": null,
-  "history": [],
+  "currentSteward": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720",
+  "designatedSuccessor": "0x906039f8366F9Ef6E44A172a006bE21B66dE7C63",
+  "history": [
+    {
+      "at": "2026-09-19T05:46:37.798Z",
+      "entryReference": "967e0dd4cc09674a71742bc83776ba6b39f399e0fc6c3b786c991094d7da28cb",
+      "epoch": 0,
+      "record": "handoffs/2026-09-19-epoch-0.json",
+      "registryFeedIndex": 0,
+      "steward": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99",
+      "stewardName": "Ngawang Dorje"
+    },
+    {
+      "at": "2026-09-19T05:52:07.829Z",
+      "entryReference": "0d558b12415865406f82bbef9e6a5687eeb552ac511816a37ede1146b7a409a7",
+      "epoch": 1,
+      "record": "handoffs/2026-09-19-epoch-1.json",
+      "registryFeedIndex": 1,
+      "steward": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720",
+      "stewardName": "Padma Chodon"
+    }
+  ],
   "libraries": [
     {
-      "address": null,
+      "address": "0x0b6409c83d6CF1874FB307F3CA21A4224e18FFB6",
       "id": "diskit",
       "keyName": "library-diskit",
       "name": "Diskit library committee",
       "valley": "Ladakh"
     },
     {
-      "address": null,
+      "address": "0x9D1298BE49EdcE997464464D50F8251C9A53D4AF",
       "id": "thiksey",
       "keyName": "library-thiksey",
       "name": "Thiksey library committee",
       "valley": "Ladakh"
     },
     {
-      "address": null,
+      "address": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87",
       "id": "hemis",
       "keyName": "library-hemis",
       "name": "Hemis library committee",
       "valley": "Ladakh"
     },
     {
-      "address": null,
+      "address": "0xAE823252730c6dB4a1bdE010Dddc5220ED733875",
       "id": "alchi",
       "keyName": "library-alchi",
       "name": "Alchi library committee",
       "valley": "Ladakh"
     },
     {
-      "address": null,
+      "address": "0x536f2dd5E150cB087e1F46dAd444e037C27959aD",
       "id": "lamayuru",
       "keyName": "library-lamayuru",
       "name": "Lamayuru library committee",
       "valley": "Ladakh"
     },
     {
-      "address": null,
+      "address": "0x91A4935D87166e09fb27d01d946B1Cf61dc87Cc4",
       "id": "kye",
       "keyName": "library-kye",
       "name": "Kye library committee",
       "valley": "Spiti"
     },
     {
-      "address": null,
+      "address": "0x42DAF750ea05e3D9dd39D1213C7d29E0B20e3ae7",
       "id": "tabo",
       "keyName": "library-tabo",
       "name": "Tabo library committee",
@@ -71,24 +93,24 @@
     "nodeAddress": "0x9452a51F8b43239b8572C08253E4b7ECAf339cb8",
     "role": "The Bee node wallet. It owns every postage batch on this shared node and pays for storage. It never signs catalogue or registry updates."
   },
-  "registryManifest": null,
+  "registryManifest": "37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2",
   "schema": "lsc/config@1",
-  "status": "awaiting-live-ceremony",
+  "status": "live",
   "stewards": [
     {
-      "address": null,
+      "address": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99",
       "keyName": "steward-ngawang",
       "library": "hemis",
       "name": "Ngawang Dorje"
     },
     {
-      "address": null,
+      "address": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720",
       "keyName": "steward-padma",
       "library": "tabo",
       "name": "Padma Chodon"
     },
     {
-      "address": null,
+      "address": "0x906039f8366F9Ef6E44A172a006bE21B66dE7C63",
       "keyName": "steward-stanzin",
       "library": "thiksey",
       "name": "Stanzin Namgyal"
