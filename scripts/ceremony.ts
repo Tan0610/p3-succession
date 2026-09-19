@@ -176,7 +176,7 @@ async function live() {
   // What a stranger sees right now: the corrections, signed, on top of a catalogue nobody has republished.
   const seen = await resolveAll(readStore, anchor).catch(() => null)
   const verified = seen?.pending.filter((p) => p.verified).length ?? 0
-  if (verified) say(`a keyless reader already sees ${verified} signed correction(s) on top of ${seen?.source?.stewardName}'s catalogue. ${first.name} has not touched them.`)
+  if (verified) say(`a keyless reader already sees ${verified} signed correction(s) on top of ${seen?.source ? `${seen.source.stewardName}'s catalogue` : 'the catalogue (the node has not indexed it yet)'}. ${first.name} has not touched them.`)
 
   act(`5. Keep the storage alive: extend the existing batch by ${extendDays} day(s)`)
   if (readLedger().some((e) => e.action === 'extend' || e.action === 'topup')) say('already extended once (see STORAGE_LOG.md)')
