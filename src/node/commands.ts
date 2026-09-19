@@ -1,4 +1,4 @@
-import { existsSync, writeFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { BZZ, type Bee } from '@ethersphere/bee-js'
 import { stats } from '../core/catalogue.js'
@@ -15,7 +15,7 @@ import {
   submitCorrection,
   type HandoffOutcome,
 } from '../core/operations.js'
-import { readRegistry, resolveAll, defaultAnchor, type Anchor, type CatalogueView } from '../core/resolve.js'
+import { readRegistry, resolveAll, defaultAnchor, type CatalogueView } from '../core/resolve.js'
 import { Catalogue, CorrectionChanges, LibraryId, TriggerId, type Condition, type HandoffProposal } from '../core/schemas.js'
 import { recoverSigner, verifyQuorum, requiredThreshold } from '../core/signatures.js'
 import { feedUpdateAddress, sameAddress, shortHex } from '../core/swarm.js'
@@ -36,7 +36,7 @@ import {
 import { listHandoffRecords, loadProposal, noteSuccessorPublication, proposalPath, recordFor, saveProposal, writeHandoffRecord } from './evidence.js'
 import { assertIdentitiesSeparated } from './identities.js'
 import { hasKey, loadIdentity, newKey } from './keys.js'
-import { PATHS, repoPath, ROOT } from './paths.js'
+import { repoPath, ROOT } from './paths.js'
 import {
   buyBatch,
   extendBatch,
@@ -539,15 +539,8 @@ export async function checkTrigger(c: Ctx, opts: { unanswered?: number; declared
   return states
 }
 
-export function writeJson(path: string, value: unknown) {
-  writeFileSync(path, JSON.stringify(value, null, 2) + '\n')
-}
-
 export function proposalFor(epoch: number): string {
   const path = proposalPath(epoch)
   if (!existsSync(path)) throw new Error(`No proposal for epoch ${epoch} at ${repoPath(path)}`)
   return path
 }
-
-export { PATHS }
-export type { Anchor }
