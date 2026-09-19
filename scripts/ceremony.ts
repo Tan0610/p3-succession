@@ -14,7 +14,7 @@ import { parseArgs } from 'node:util'
 import { MemoryFeedStore } from '../src/core/memory-feedstore.js'
 import { performHandoff, QuorumRejected } from '../src/core/operations.js'
 import { makeEphemeralCast, rehearse } from '../src/core/rehearsal.js'
-import { readRegistry } from '../src/core/resolve.js'
+import { readRegistry, resolveAll } from '../src/core/resolve.js'
 import { requiredThreshold, signText } from '../src/core/signatures.js'
 import { sameAddress } from '../src/core/swarm.js'
 import { auditSecrets } from '../src/node/audit.js'
@@ -161,7 +161,7 @@ async function live() {
   if ((await readStore.latestIndex(first.address!, anchor.catalogueTopicHex)) !== null) say('already published')
   else await cataloguePublish(c, { as: first.keyName })
 
-  act('4. Tabo and Kye post signed corrections, without the steward')
+  act('4. Tabo and Kye correct the catalogue themselves: no email, no steward key')
   const seed = loadSeed()
   const corrections = [
     { as: 'tabo', record: seed.records.find((r) => r.library === 'tabo')!.id, set: ['condition=damaged', 'photographed=true'], note: 'Water stain on the last twelve folios after the spring leak.' },
@@ -173,6 +173,10 @@ async function live() {
     if ((await readStore.latestIndex(lib.address!, anchor.correctionsTopicHex)) !== null) say(`${lib.name}: already posted`)
     else await correctionSubmit(c, k)
   }
+  // What a stranger sees right now: the corrections, signed, on top of a catalogue nobody has republished.
+  const seen = await resolveAll(readStore, anchor).catch(() => null)
+  const verified = seen?.pending.filter((p) => p.verified).length ?? 0
+  if (verified) say(`a keyless reader already sees ${verified} signed correction(s) on top of ${seen?.source?.stewardName}'s catalogue. ${first.name} has not touched them.`)
 
   act(`5. Keep the storage alive: extend the existing batch by ${extendDays} day(s)`)
   if (readLedger().some((e) => e.action === 'extend' || e.action === 'topup')) say('already extended once (see STORAGE_LOG.md)')
