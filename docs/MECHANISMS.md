@@ -30,6 +30,28 @@ Sources: `@ethersphere/bee-js@13.1.0` type definitions and compiled source (`dis
 
 5. **Signatures: two schemes, deliberately.** `PrivateKey.sign(data)` in core-sdk signs `keccak256("\x19Ethereum Signed Message:\n32" ‖ keccak256(data))`. It is right for chunks, but awkward for a committee member with MetaMask. Human seals therefore use standard `personal_sign` over readable text (ethers v6). `test/signatures.test.ts` shows how the two relate.
 
+## Topping up from your own wallet (no node, no permission)
+
+This is how a library, or a donor, keeps the catalogue paid for when nobody who runs the node is answering. The rent lives on Gnosis Chain, not on the node, so the node doesn't have to be online. The chunks are held by the network's storage nodes for as long as the batch has balance. You need a wallet holding xBZZ and a little xDAI for gas, and [Foundry's `cast`](https://getfoundry.sh).
+
+```sh
+RPC=https://rpc.gnosischain.com
+POSTAGE=0x45a1502382541Cd610CC9068e88727426b696293   # PostageStamp contract, Gnosis Chain
+XBZZ=0xdBF3Ea6F5beE45c02255B2c26a16F300502F68da      # xBZZ token, Gnosis Chain
+BATCH=0x<"postage batch" from the anchor block in README.md>
+DAYS=30
+
+DEPTH=$(cast call $POSTAGE "batchDepth(bytes32)(uint8)" $BATCH --rpc-url $RPC | awk '{print $1}')
+PRICE=$(cast call $POSTAGE "lastPrice()(uint64)" --rpc-url $RPC | awk '{print $1}')   # PLUR per chunk per 5 s block
+PER_CHUNK=$(( PRICE * 17280 * DAYS ))    # 17 280 blocks a day
+TOTAL=$(( PER_CHUNK << DEPTH ))          # what the contract pulls from you, in PLUR (1 xBZZ = 10^16 PLUR)
+
+cast send $XBZZ "approve(address,uint256)" $POSTAGE $TOTAL --rpc-url $RPC --account my-library
+cast send $POSTAGE "topUp(bytes32,uint256)" $BATCH $PER_CHUNK --rpc-url $RPC --account my-library
+```
+
+`topUp` checks only that the batch exists and has not yet expired ([source](https://github.com/ethersphere/storage-incentives/blob/master/src/PostageStamp.sol)). It never asks who you are. Contract addresses are from `mainnet_deployed.json` in the same repository. The operator of the node can do the same with `npm run cli -- storage extend --days N --yes` (node wallet pays). Either way, write the payment into `STORAGE_LOG.md` so the other libraries can see it. A payment made from another wallet shows up in `npm run cli -- storage status` as more days left.
+
 ## What we did not build (and why)
 
 - **A Safe multisig on Gnosis holding a storage endowment** that tops up the batch with 4 of 7 signatures. `topUp` is permissionless, so this would work without Bee's cooperation. It is the natural next step, but funding seven signers with xDAI was out of scope for a weekend.

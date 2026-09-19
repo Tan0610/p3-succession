@@ -117,7 +117,7 @@ If the steward stops publishing, corrections are still visible to every reader, 
 Swarm storage is **rent paid in advance, not a purchase**. A postage batch lasts until its prepaid balance runs out. When it does, the catalogue can disappear from the network.
 
 - The storage is checked **at least once a month** (`npm run cli -- storage status`), and every extension is written in `STORAGE_LOG.md`.
-- **Anyone may add to the rent.** Topping up an existing batch is open to anyone on the Gnosis Chain, not only its owner. Any library, donor or well-wisher with xBZZ can extend the storage without asking permission.
+- **Anyone may add to the rent.** Topping up an existing batch is open to anyone on the Gnosis Chain, not only its owner. Any library, donor or well-wisher with xBZZ can extend the storage without asking permission, and without the steward or the node's operator being reachable. All they need is the batch number, printed as "postage batch" in §10. The two commands are in [`docs/MECHANISMS.md`](docs/MECHANISMS.md#topping-up-from-your-own-wallet-no-node-no-permission).
 - If the storage falls below 30 days, that is trigger T3, whether or not the steward is active.
 
 ## 8. What this arrangement cannot protect against
@@ -151,6 +151,7 @@ registry topic (hex)            : f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46
 registry feed manifest          : (created by the first live hand-off)
 catalogue topic                 : lsc/catalogue/v1  (5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f)
 corrections topic               : lsc/corrections/v1  (2cf9be53bb7408cee80ea7678ddcb7700e4ae3167670105625954316124ee633)
+postage batch (open to top-ups) : (bought before the live ceremony: npm run cli -- storage buy)
 ```
 <!-- /lsc:anchor -->
 

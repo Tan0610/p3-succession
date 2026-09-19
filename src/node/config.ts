@@ -196,6 +196,7 @@ export function renderAnchorBlock(c: StewardshipConfig): string {
     `registry feed manifest          : ${c.registryManifest ?? PENDING_REGISTRY}`,
     `catalogue topic                 : ${c.topics.catalogue.string}  (${c.topics.catalogue.hex})`,
     `corrections topic               : ${c.topics.corrections.string}  (${c.topics.corrections.hex})`,
+    `postage batch (open to top-ups) : ${c.payer.batchId ?? '(bought before the live ceremony: npm run cli -- storage buy)'}`,
     '```',
   ].join('\n')
 }
