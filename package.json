@@ -11,6 +11,7 @@
     "cli": "tsx cli/succession.ts",
     "ceremony": "tsx scripts/ceremony.ts",
     "verify:handoff": "tsx scripts/verify-handoff.ts",
+    "watchdog": "tsx scripts/watchdog.ts",
     "audit:secrets": "tsx cli/succession.ts audit secrets",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p web/tsconfig.json --noEmit",
     "lint": "eslint .",

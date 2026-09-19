@@ -20,6 +20,7 @@ export const PATHS = {
   stewardship: join(ROOT, 'STEWARDSHIP.md'),
   readme: join(ROOT, 'README.md'),
   readWithoutUs: join(ROOT, 'docs', 'READ_WITHOUT_US.md'),
+  mechanisms: join(ROOT, 'docs', 'MECHANISMS.md'),
 } as const
 
 /** A repo-relative path with forward slashes, so tracked files read the same on Windows and elsewhere. */
