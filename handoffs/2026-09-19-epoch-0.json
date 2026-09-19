@@ -1,0 +1,165 @@
+{
+  "schema": "lsc/handoff-record@1",
+  "mode": "live",
+  "performedAt": "2026-09-19T05:46:37.798Z",
+  "honesty": "Honest note: this hand-off was performed by a single person. All signing keys (seven library committees, three stewards, the council scribe) were generated on one machine for the demonstration and live in its git-ignored .secrets/ folder. In real use each library committee and each steward generates their own key on their own device and shares only the address. The storage is also not separated: every postage batch belongs to the one shared Bee node.",
+  "notes": [],
+  "bee": {
+    "url": "http://localhost:1633",
+    "version": "2.8.2-7e703f49",
+    "apiVersion": "8.1.1"
+  },
+  "payer": {
+    "nodeAddress": "0x9452a51F8b43239b8572C08253E4b7ECAf339cb8",
+    "batchId": "65c1e84317fa4a5f469bd5b53180edaab7c2fc7fa5d66b4c2bbe86a749a6038c",
+    "ttlDaysAtHandoff": 14
+  },
+  "council": {
+    "scribe": "0xB3959e06E1edE30605Ed3136C857cC57B0a64af0",
+    "registryTopic": "lsc/registry/v1",
+    "registryTopicHex": "f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46967eb51c77a4b88a6d",
+    "registryManifest": "37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2"
+  },
+  "epoch": 0,
+  "kind": "genesis",
+  "trigger": "T0-genesis",
+  "statement": "Ladakh–Spiti Shared Manuscript Catalogue — Succession Statement v1\nCatalogue: ladakh-spiti-manuscripts\nCharter: 0xeaaab87204f6e075b06e78f175c261ca39e8997afb55c95c86d2d161f6c90430\nEpoch: 0 (previous registry entry: none — this is the genesis of the registry)\nOutgoing steward: none\nIncoming steward: 0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99 (Ngawang Dorje)\nNext designated successor: 0x9e9e0Cd098e4492bfC6889014d48936eE01a3720 (Padma Chodon)\nTrigger: T0-genesis\nEffective from: 2026-09-19\nWe consent that readers follow the incoming steward's catalogue feed from this epoch.",
+  "outgoing": null,
+  "incoming": {
+    "address": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99",
+    "name": "Ngawang Dorje",
+    "acceptanceSignature": "0xfe0ea2ec191c58df540cb43c55811aa35eb6017a4538c4ccf1c34eade7e0ceec0ec10acd90dd9259b8fab2a51919300eb05618984787b38be6e92ee3241d2d421b",
+    "suppliedAs": "--incoming 0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99"
+  },
+  "nextDesignated": {
+    "address": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720",
+    "name": "Padma Chodon"
+  },
+  "approvals": [
+    {
+      "library": "hemis",
+      "address": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87",
+      "signature": "0x120d5a25756c3fe03c6904528e25078d59176cae1c6449f28c18ca3ae7df7acf173d4456aa5f5926a6a1237928cf2b6443af134f5ce8d8145a03a4487398d9161c",
+      "recovered": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87",
+      "valid": true
+    },
+    {
+      "library": "thiksey",
+      "address": "0x9D1298BE49EdcE997464464D50F8251C9A53D4AF",
+      "signature": "0x906435d1bce173b087302cc5e95ddd92bf9c931299d87e5322b7b35d5896346820f38efdb833dcb24899d20629c747ed744590a9bc2d0bee45e44bbf9a5817061b",
+      "recovered": "0x9D1298BE49EdcE997464464D50F8251C9A53D4AF",
+      "valid": true
+    },
+    {
+      "library": "diskit",
+      "address": "0x0b6409c83d6CF1874FB307F3CA21A4224e18FFB6",
+      "signature": "0xe1e6843e1db358330a152fa2ee54c4018545639ad455d2fff438960d69b1804751299ab65139079aed7f87a15322ff8d0465028bdfbfc16da3cd9a95ec38fe641c",
+      "recovered": "0x0b6409c83d6CF1874FB307F3CA21A4224e18FFB6",
+      "valid": true
+    },
+    {
+      "library": "lamayuru",
+      "address": "0x536f2dd5E150cB087e1F46dAd444e037C27959aD",
+      "signature": "0x5c9a49720a46ba3dc811440add508f0fa46f5d3a711b2cc0072f2a8255b1da0018c202c95c7f47eb62c3e671d92ea6cb835910e02136c89b1bf05cf59611ac931b",
+      "recovered": "0x536f2dd5E150cB087e1F46dAd444e037C27959aD",
+      "valid": true
+    }
+  ],
+  "threshold": "4 valid of 4 required (charter has 7 members)",
+  "registryUpdate": {
+    "feedIndex": 0,
+    "entryReference": "967e0dd4cc09674a71742bc83776ba6b39f399e0fc6c3b786c991094d7da28cb",
+    "socAddress": "6afb09ba707802c64674c59ea73b917149ec24e1a44d845d9e4a0f9c2b6027ff",
+    "socOwner": "0xB3959e06E1edE30605Ed3136C857cC57B0a64af0",
+    "socSignature": "0xa75b62fd6b3b624c282f6ef954d0f99d2b9438160695f0d9ba8979476092bf5c418b379c294a78cac87dc3008740ebccc235f62ed62a3ba3dbf6c42d200877451c",
+    "readBack": {
+      "feedIndex": 0,
+      "entryReference": "967e0dd4cc09674a71742bc83776ba6b39f399e0fc6c3b786c991094d7da28cb",
+      "match": true
+    },
+    "readersNowFollow": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99"
+  },
+  "catalogueManifestForIncoming": "922c102624e35c04c87b580f0f44087ea459e90fad20363fa1596441d888668b",
+  "identitiesSeparated": [
+    {
+      "role": "payer",
+      "name": "Bee node wallet",
+      "address": "0x9452a51F8b43239b8572C08253E4b7ECAf339cb8"
+    },
+    {
+      "role": "scribe",
+      "name": "Council scribe",
+      "address": "0xB3959e06E1edE30605Ed3136C857cC57B0a64af0"
+    },
+    {
+      "role": "steward",
+      "name": "Ngawang Dorje",
+      "address": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99"
+    },
+    {
+      "role": "steward",
+      "name": "Padma Chodon",
+      "address": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720"
+    },
+    {
+      "role": "steward",
+      "name": "Stanzin Namgyal",
+      "address": "0x906039f8366F9Ef6E44A172a006bE21B66dE7C63"
+    },
+    {
+      "role": "library",
+      "name": "Diskit library committee",
+      "address": "0x0b6409c83d6CF1874FB307F3CA21A4224e18FFB6"
+    },
+    {
+      "role": "library",
+      "name": "Thiksey library committee",
+      "address": "0x9D1298BE49EdcE997464464D50F8251C9A53D4AF"
+    },
+    {
+      "role": "library",
+      "name": "Hemis library committee",
+      "address": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87"
+    },
+    {
+      "role": "library",
+      "name": "Alchi library committee",
+      "address": "0xAE823252730c6dB4a1bdE010Dddc5220ED733875"
+    },
+    {
+      "role": "library",
+      "name": "Lamayuru library committee",
+      "address": "0x536f2dd5E150cB087e1F46dAd444e037C27959aD"
+    },
+    {
+      "role": "library",
+      "name": "Kye library committee",
+      "address": "0x91A4935D87166e09fb27d01d946B1Cf61dc87Cc4"
+    },
+    {
+      "role": "library",
+      "name": "Tabo library committee",
+      "address": "0x42DAF750ea05e3D9dd39D1213C7d29E0B20e3ae7"
+    }
+  ],
+  "rejectedAttempts": [],
+  "successorFirstPublication": {
+    "feedIndex": 0,
+    "catalogueReference": "a9e716452fb27fe0cc8b08a38efe96f820d59a460b8449209e1285a303d586e4",
+    "version": 1,
+    "applied": 0,
+    "proposed": 0,
+    "at": "2026-09-19T05:47:39.267Z",
+    "socAddress": "c3e3a6e4985a31d7d2d2c79436d600ff90aa8db984727521f47e5a452030acb8",
+    "socOwner": null,
+    "socSignature": null
+  },
+  "verify": {
+    "cli": "npm run verify:handoff -- handoffs/2026-09-19-epoch-0.json",
+    "curl": [
+      "curl http://localhost:1633/bzz/37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2/",
+      "curl http://localhost:1633/bzz/967e0dd4cc09674a71742bc83776ba6b39f399e0fc6c3b786c991094d7da28cb/",
+      "curl http://localhost:1633/bzz/922c102624e35c04c87b580f0f44087ea459e90fad20363fa1596441d888668b/catalogue.json"
+    ]
+  }
+}

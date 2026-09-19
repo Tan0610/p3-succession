@@ -1,0 +1,68 @@
+{
+  "acceptance": {
+    "address": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720",
+    "signature": "0x8e7d4a63d2c82d4657cbfa4ef1a6bf72c474ec95ff635bcbb33445d9b9f6ecb42a3face996e856001b55af331257d386dd1313326a6659820eb954d75fb493b21c"
+  },
+  "approvals": [
+    {
+      "address": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87",
+      "library": "hemis",
+      "signature": "0xad7abae4c06a3cf6bdad51080666d43a87e2dc2b022121694b274dc742a1bf50302df5ccc1c1271749ec97938a54fd4c103ee65949fa162e9a35c0a9713cfa031b"
+    },
+    {
+      "address": "0xAE823252730c6dB4a1bdE010Dddc5220ED733875",
+      "library": "alchi",
+      "signature": "0x9fc209f496684661314b7a241674e3304d3673a1e633c8b683689f856da4458a2cde46362d263547e0738597b6986f6747de50309e3910287619a139863a111a1c"
+    },
+    {
+      "address": "0x42DAF750ea05e3D9dd39D1213C7d29E0B20e3ae7",
+      "library": "tabo",
+      "signature": "0xf0b841ae92c59cd6b7a64770a59a4cd25c9cb48266f42a9715ef9bff3093d82a13b9ed8a8774d5a92ca7de37faa6debcc7e14fe0f154abf478c74b44409807a11c"
+    },
+    {
+      "address": "0x91A4935D87166e09fb27d01d946B1Cf61dc87Cc4",
+      "library": "kye",
+      "signature": "0xe1a8b4f4a926fbb101230a576a626e42ea21c75f74593a31cc47409f87d2b1c07791442f09a30691876d8b374c2041a62bab77815eca2b171054dbb01391d0d51c"
+    }
+  ],
+  "catalogueId": "ladakh-spiti-manuscripts",
+  "createdAt": "2026-09-19T05:52:02.716Z",
+  "fields": {
+    "catalogueId": "ladakh-spiti-manuscripts",
+    "charterHash": "0xeaaab87204f6e075b06e78f175c261ca39e8997afb55c95c86d2d161f6c90430",
+    "effectiveFrom": "2026-09-19",
+    "epoch": 1,
+    "incoming": {
+      "address": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720",
+      "library": "tabo",
+      "name": "Padma Chodon"
+    },
+    "next": {
+      "address": "0x906039f8366F9Ef6E44A172a006bE21B66dE7C63",
+      "name": "Stanzin Namgyal"
+    },
+    "outgoing": {
+      "address": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99",
+      "name": "Ngawang Dorje"
+    },
+    "previous": {
+      "feedIndex": 0,
+      "reference": "967e0dd4cc09674a71742bc83776ba6b39f399e0fc6c3b786c991094d7da28cb"
+    },
+    "trigger": "T2-silence"
+  },
+  "rejectedAttempts": [
+    {
+      "at": "2026-09-19T05:52:03.766Z",
+      "attempt": "The outgoing steward signs on behalf of Hemis",
+      "result": "Refused: 0 valid seal(s) of 4 needed (hemis: signature does not recover to the library key)"
+    },
+    {
+      "at": "2026-09-19T05:52:03.787Z",
+      "attempt": "3 of 7 libraries seal the hand-off",
+      "result": "Refused: 3 valid seal(s) of 4 needed"
+    }
+  ],
+  "schema": "lsc/handoff-proposal@1",
+  "statement": "Ladakh–Spiti Shared Manuscript Catalogue — Succession Statement v1\nCatalogue: ladakh-spiti-manuscripts\nCharter: 0xeaaab87204f6e075b06e78f175c261ca39e8997afb55c95c86d2d161f6c90430\nEpoch: 1 (previous registry entry: #0 967e0dd4cc09674a71742bc83776ba6b39f399e0fc6c3b786c991094d7da28cb)\nOutgoing steward: 0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99 (Ngawang Dorje)\nIncoming steward: 0x9e9e0Cd098e4492bfC6889014d48936eE01a3720 (Padma Chodon)\nNext designated successor: 0x906039f8366F9Ef6E44A172a006bE21B66dE7C63 (Stanzin Namgyal)\nTrigger: T2-silence\nEffective from: 2026-09-19\nWe consent that readers follow the incoming steward's catalogue feed from this epoch."
+}

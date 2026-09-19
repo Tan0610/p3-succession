@@ -1,0 +1,188 @@
+{
+  "schema": "lsc/handoff-record@1",
+  "mode": "live",
+  "performedAt": "2026-09-19T05:52:07.829Z",
+  "honesty": "Honest note: this hand-off was performed by a single person. All signing keys (seven library committees, three stewards, the council scribe) were generated on one machine for the demonstration and live in its git-ignored .secrets/ folder. In real use each library committee and each steward generates their own key on their own device and shares only the address. The storage is also not separated: every postage batch belongs to the one shared Bee node.",
+  "notes": [
+    "Trigger T2 (silence) was declared by the sealing committees for this demonstration; the 60-day clock itself is exercised in the rehearsal and tests, not waited out in real time.",
+    "Ngawang Dorje's key was not used in this hand-off. The acceptance Ngawang Dorje signed at epoch 0 named Padma Chodon, which is why 4 seals suffice."
+  ],
+  "bee": {
+    "url": "http://localhost:1633",
+    "version": "2.8.2-7e703f49",
+    "apiVersion": "8.1.1"
+  },
+  "payer": {
+    "nodeAddress": "0x9452a51F8b43239b8572C08253E4b7ECAf339cb8",
+    "batchId": "65c1e84317fa4a5f469bd5b53180edaab7c2fc7fa5d66b4c2bbe86a749a6038c",
+    "ttlDaysAtHandoff": 15
+  },
+  "council": {
+    "scribe": "0xB3959e06E1edE30605Ed3136C857cC57B0a64af0",
+    "registryTopic": "lsc/registry/v1",
+    "registryTopicHex": "f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46967eb51c77a4b88a6d",
+    "registryManifest": "37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2"
+  },
+  "epoch": 1,
+  "kind": "handoff",
+  "trigger": "T2-silence",
+  "statement": "Ladakh–Spiti Shared Manuscript Catalogue — Succession Statement v1\nCatalogue: ladakh-spiti-manuscripts\nCharter: 0xeaaab87204f6e075b06e78f175c261ca39e8997afb55c95c86d2d161f6c90430\nEpoch: 1 (previous registry entry: #0 967e0dd4cc09674a71742bc83776ba6b39f399e0fc6c3b786c991094d7da28cb)\nOutgoing steward: 0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99 (Ngawang Dorje)\nIncoming steward: 0x9e9e0Cd098e4492bfC6889014d48936eE01a3720 (Padma Chodon)\nNext designated successor: 0x906039f8366F9Ef6E44A172a006bE21B66dE7C63 (Stanzin Namgyal)\nTrigger: T2-silence\nEffective from: 2026-09-19\nWe consent that readers follow the incoming steward's catalogue feed from this epoch.",
+  "outgoing": {
+    "address": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99",
+    "name": "Ngawang Dorje",
+    "lastCatalogueFeedIndex": 0,
+    "lastCatalogueSoc": {
+      "socAddress": "c3e3a6e4985a31d7d2d2c79436d600ff90aa8db984727521f47e5a452030acb8",
+      "owner": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99",
+      "signature": "0x1b0620242da171415c74d4471c1e26d020065cf52f7f96b6e0bfd02831fef149149d403df3b61d57661cc50adfa9fe0c8740dd7c5826a311f8fee7f5ca0c86ec1b"
+    }
+  },
+  "incoming": {
+    "address": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720",
+    "name": "Padma Chodon",
+    "acceptanceSignature": "0x8e7d4a63d2c82d4657cbfa4ef1a6bf72c474ec95ff635bcbb33445d9b9f6ecb42a3face996e856001b55af331257d386dd1313326a6659820eb954d75fb493b21c",
+    "suppliedAs": "--incoming 0x9e9e0Cd098e4492bfC6889014d48936eE01a3720"
+  },
+  "nextDesignated": {
+    "address": "0x906039f8366F9Ef6E44A172a006bE21B66dE7C63",
+    "name": "Stanzin Namgyal"
+  },
+  "approvals": [
+    {
+      "library": "hemis",
+      "address": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87",
+      "signature": "0xad7abae4c06a3cf6bdad51080666d43a87e2dc2b022121694b274dc742a1bf50302df5ccc1c1271749ec97938a54fd4c103ee65949fa162e9a35c0a9713cfa031b",
+      "recovered": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87",
+      "valid": true
+    },
+    {
+      "library": "alchi",
+      "address": "0xAE823252730c6dB4a1bdE010Dddc5220ED733875",
+      "signature": "0x9fc209f496684661314b7a241674e3304d3673a1e633c8b683689f856da4458a2cde46362d263547e0738597b6986f6747de50309e3910287619a139863a111a1c",
+      "recovered": "0xAE823252730c6dB4a1bdE010Dddc5220ED733875",
+      "valid": true
+    },
+    {
+      "library": "tabo",
+      "address": "0x42DAF750ea05e3D9dd39D1213C7d29E0B20e3ae7",
+      "signature": "0xf0b841ae92c59cd6b7a64770a59a4cd25c9cb48266f42a9715ef9bff3093d82a13b9ed8a8774d5a92ca7de37faa6debcc7e14fe0f154abf478c74b44409807a11c",
+      "recovered": "0x42DAF750ea05e3D9dd39D1213C7d29E0B20e3ae7",
+      "valid": true
+    },
+    {
+      "library": "kye",
+      "address": "0x91A4935D87166e09fb27d01d946B1Cf61dc87Cc4",
+      "signature": "0xe1a8b4f4a926fbb101230a576a626e42ea21c75f74593a31cc47409f87d2b1c07791442f09a30691876d8b374c2041a62bab77815eca2b171054dbb01391d0d51c",
+      "recovered": "0x91A4935D87166e09fb27d01d946B1Cf61dc87Cc4",
+      "valid": true
+    }
+  ],
+  "threshold": "4 valid of 4 required (charter has 7 members)",
+  "registryUpdate": {
+    "feedIndex": 1,
+    "entryReference": "0d558b12415865406f82bbef9e6a5687eeb552ac511816a37ede1146b7a409a7",
+    "socAddress": "a9e6be18de613cc7ef6a2584b683e96427bea54217053e7f3823a1438ef10296",
+    "socOwner": "0xB3959e06E1edE30605Ed3136C857cC57B0a64af0",
+    "socSignature": "0xfa829f850a8815835ae3f4cea958d5cd6fdc0726485c6e2c7693d6410707325a0391a6596255f696144498b7b7963cd37b6a947014f5f0581a9a7a3eec4f30ff1b",
+    "readBack": {
+      "feedIndex": 1,
+      "entryReference": "0d558b12415865406f82bbef9e6a5687eeb552ac511816a37ede1146b7a409a7",
+      "match": true
+    },
+    "readersNowFollow": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720"
+  },
+  "catalogueManifestForIncoming": "f612ba148b7fbd9dfa4126d6876963b7c02207884b385f732256441dd214d2fc",
+  "identitiesSeparated": [
+    {
+      "role": "payer",
+      "name": "Bee node wallet",
+      "address": "0x9452a51F8b43239b8572C08253E4b7ECAf339cb8"
+    },
+    {
+      "role": "scribe",
+      "name": "Council scribe",
+      "address": "0xB3959e06E1edE30605Ed3136C857cC57B0a64af0"
+    },
+    {
+      "role": "steward",
+      "name": "Ngawang Dorje",
+      "address": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99"
+    },
+    {
+      "role": "steward",
+      "name": "Padma Chodon",
+      "address": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720"
+    },
+    {
+      "role": "steward",
+      "name": "Stanzin Namgyal",
+      "address": "0x906039f8366F9Ef6E44A172a006bE21B66dE7C63"
+    },
+    {
+      "role": "library",
+      "name": "Diskit library committee",
+      "address": "0x0b6409c83d6CF1874FB307F3CA21A4224e18FFB6"
+    },
+    {
+      "role": "library",
+      "name": "Thiksey library committee",
+      "address": "0x9D1298BE49EdcE997464464D50F8251C9A53D4AF"
+    },
+    {
+      "role": "library",
+      "name": "Hemis library committee",
+      "address": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87"
+    },
+    {
+      "role": "library",
+      "name": "Alchi library committee",
+      "address": "0xAE823252730c6dB4a1bdE010Dddc5220ED733875"
+    },
+    {
+      "role": "library",
+      "name": "Lamayuru library committee",
+      "address": "0x536f2dd5E150cB087e1F46dAd444e037C27959aD"
+    },
+    {
+      "role": "library",
+      "name": "Kye library committee",
+      "address": "0x91A4935D87166e09fb27d01d946B1Cf61dc87Cc4"
+    },
+    {
+      "role": "library",
+      "name": "Tabo library committee",
+      "address": "0x42DAF750ea05e3D9dd39D1213C7d29E0B20e3ae7"
+    }
+  ],
+  "rejectedAttempts": [
+    {
+      "at": "2026-09-19T05:52:03.766Z",
+      "attempt": "The outgoing steward signs on behalf of Hemis",
+      "result": "Refused: 0 valid seal(s) of 4 needed (hemis: signature does not recover to the library key)"
+    },
+    {
+      "at": "2026-09-19T05:52:03.787Z",
+      "attempt": "3 of 7 libraries seal the hand-off",
+      "result": "Refused: 3 valid seal(s) of 4 needed"
+    }
+  ],
+  "successorFirstPublication": {
+    "feedIndex": 0,
+    "catalogueReference": "0328398dc9b3fe1544afd87239e1292050c7b0b541e263e249941f90210e8f75",
+    "version": 2,
+    "applied": 1,
+    "proposed": 1,
+    "at": "2026-09-19T05:52:31.228Z",
+    "socAddress": "aada0de1bdcedac4054764638d103b906349c7c6d4c0bb8d6a4db2bede119d35",
+    "socOwner": null,
+    "socSignature": null
+  },
+  "verify": {
+    "cli": "npm run verify:handoff -- handoffs/2026-09-19-epoch-1.json",
+    "curl": [
+      "curl http://localhost:1633/bzz/37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2/",
+      "curl http://localhost:1633/bzz/0d558b12415865406f82bbef9e6a5687eeb552ac511816a37ede1146b7a409a7/",
+      "curl http://localhost:1633/bzz/f612ba148b7fbd9dfa4126d6876963b7c02207884b385f732256441dd214d2fc/catalogue.json"
+    ]
+  }
+}

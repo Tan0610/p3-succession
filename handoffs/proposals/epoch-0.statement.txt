@@ -1,0 +1,10 @@
+Ladakh–Spiti Shared Manuscript Catalogue — Succession Statement v1
+Catalogue: ladakh-spiti-manuscripts
+Charter: 0xeaaab87204f6e075b06e78f175c261ca39e8997afb55c95c86d2d161f6c90430
+Epoch: 0 (previous registry entry: none — this is the genesis of the registry)
+Outgoing steward: none
+Incoming steward: 0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99 (Ngawang Dorje)
+Next designated successor: 0x9e9e0Cd098e4492bfC6889014d48936eE01a3720 (Padma Chodon)
+Trigger: T0-genesis
+Effective from: 2026-09-19
+We consent that readers follow the incoming steward's catalogue feed from this epoch.

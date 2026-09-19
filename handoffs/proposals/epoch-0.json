@@ -1,0 +1,51 @@
+{
+  "acceptance": {
+    "address": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99",
+    "signature": "0xfe0ea2ec191c58df540cb43c55811aa35eb6017a4538c4ccf1c34eade7e0ceec0ec10acd90dd9259b8fab2a51919300eb05618984787b38be6e92ee3241d2d421b"
+  },
+  "approvals": [
+    {
+      "address": "0x6Becf774B2bE9008bcFc9f5aE84bb5BDF4765f87",
+      "library": "hemis",
+      "signature": "0x120d5a25756c3fe03c6904528e25078d59176cae1c6449f28c18ca3ae7df7acf173d4456aa5f5926a6a1237928cf2b6443af134f5ce8d8145a03a4487398d9161c"
+    },
+    {
+      "address": "0x9D1298BE49EdcE997464464D50F8251C9A53D4AF",
+      "library": "thiksey",
+      "signature": "0x906435d1bce173b087302cc5e95ddd92bf9c931299d87e5322b7b35d5896346820f38efdb833dcb24899d20629c747ed744590a9bc2d0bee45e44bbf9a5817061b"
+    },
+    {
+      "address": "0x0b6409c83d6CF1874FB307F3CA21A4224e18FFB6",
+      "library": "diskit",
+      "signature": "0xe1e6843e1db358330a152fa2ee54c4018545639ad455d2fff438960d69b1804751299ab65139079aed7f87a15322ff8d0465028bdfbfc16da3cd9a95ec38fe641c"
+    },
+    {
+      "address": "0x536f2dd5E150cB087e1F46dAd444e037C27959aD",
+      "library": "lamayuru",
+      "signature": "0x5c9a49720a46ba3dc811440add508f0fa46f5d3a711b2cc0072f2a8255b1da0018c202c95c7f47eb62c3e671d92ea6cb835910e02136c89b1bf05cf59611ac931b"
+    }
+  ],
+  "catalogueId": "ladakh-spiti-manuscripts",
+  "createdAt": "2026-09-19T05:46:37.709Z",
+  "fields": {
+    "catalogueId": "ladakh-spiti-manuscripts",
+    "charterHash": "0xeaaab87204f6e075b06e78f175c261ca39e8997afb55c95c86d2d161f6c90430",
+    "effectiveFrom": "2026-09-19",
+    "epoch": 0,
+    "incoming": {
+      "address": "0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99",
+      "library": "hemis",
+      "name": "Ngawang Dorje"
+    },
+    "next": {
+      "address": "0x9e9e0Cd098e4492bfC6889014d48936eE01a3720",
+      "name": "Padma Chodon"
+    },
+    "outgoing": null,
+    "previous": null,
+    "trigger": "T0-genesis"
+  },
+  "rejectedAttempts": [],
+  "schema": "lsc/handoff-proposal@1",
+  "statement": "Ladakh–Spiti Shared Manuscript Catalogue — Succession Statement v1\nCatalogue: ladakh-spiti-manuscripts\nCharter: 0xeaaab87204f6e075b06e78f175c261ca39e8997afb55c95c86d2d161f6c90430\nEpoch: 0 (previous registry entry: none — this is the genesis of the registry)\nOutgoing steward: none\nIncoming steward: 0x0E91aD8a49d9cB2209983E556cBEF0fdDaEBaB99 (Ngawang Dorje)\nNext designated successor: 0x9e9e0Cd098e4492bfC6889014d48936eE01a3720 (Padma Chodon)\nTrigger: T0-genesis\nEffective from: 2026-09-19\nWe consent that readers follow the incoming steward's catalogue feed from this epoch."
+}
