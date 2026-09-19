@@ -26,7 +26,7 @@ import {
 } from '../src/node/commands.js'
 import { loadConfig, syncDocs } from '../src/node/config.js'
 import { newKey } from '../src/node/keys.js'
-import { ROOT } from '../src/node/paths.js'
+import { repoPath, ROOT } from '../src/node/paths.js'
 
 const program = new Command()
   .name('succession')
@@ -169,8 +169,8 @@ succession
 program
   .command('config')
   .command('sync')
-  .description('refresh the address blocks in STEWARDSHIP.md / README from stewardship.config.json')
-  .action(() => console.log(syncDocs().map((p) => p.replace(ROOT, '.')).join('\n') || 'already in sync'))
+  .description('refresh the generated blocks in README, STEWARDSHIP, HANDOFF_LOG and docs/READ_WITHOUT_US from stewardship.config.json')
+  .action(() => console.log(syncDocs().map(repoPath).join('\n') || 'already in sync'))
 
 program
   .command('audit')

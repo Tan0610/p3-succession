@@ -7,13 +7,17 @@ import { evaluateTriggers } from '../src/core/triggers.js'
 import { auditSecrets, scanText } from '../src/node/audit.js'
 import {
   loadConfig,
+  PENDING_MARKERS,
   renderAnchorBlock,
+  renderDocs,
   renderIdentitiesBlock,
   renderStatusBlock,
   renderSuccessorBlock,
+  SYNCED_DOCS,
   type StewardshipConfig,
 } from '../src/node/config.js'
 import { assertIdentitiesSeparated } from '../src/node/identities.js'
+import { repoPath } from '../src/node/paths.js'
 
 const stewardship = readFileSync(new URL('../STEWARDSHIP.md', import.meta.url), 'utf8')
 
@@ -34,12 +38,31 @@ describe('STEWARDSHIP.md', () => {
   it('after the live ceremony every placeholder is replaced by a concrete 0x address', () => {
     const live = liveConfig()
     const docs = [renderSuccessorBlock(live), renderIdentitiesBlock(live), renderAnchorBlock(live), renderStatusBlock(live)].join('\n')
-    expect(docs).not.toMatch(/not made yet|no batch yet|created by the first live hand-off|not yet in force|not yet performed/)
+    expect(docs).not.toMatch(PENDING_MARKERS)
     const successor = renderSuccessorBlock(live)
     // the named successor, their key and the triggers, all in the same block
     expect(successor).toContain(`Stanzin Namgyal, key \`${live.designatedSuccessor}\``)
     for (const t of ['T1', 'T2', 'T3', 'T4', '60 days', '4 of the 7']) expect(successor).toContain(t)
     expect(renderStatusBlock(live)).toContain('handoffs/2026-09-20-epoch-1.json')
+  })
+
+  it('after the live ceremony no placeholder is left anywhere in the tracked documents', () => {
+    const live = liveConfig()
+    for (const path of SYNCED_DOCS) {
+      const before = readFileSync(path, 'utf8')
+      const after = renderDocs(before, live)
+      expect(after, repoPath(path)).not.toEqual(before)
+      expect(after.split('\n').filter((l) => PENDING_MARKERS.test(l)), repoPath(path)).toEqual([])
+    }
+  })
+
+  it('before the live ceremony every generated block says plainly that it is waiting for it', () => {
+    if (loadConfig().status === 'live') return
+    for (const path of SYNCED_DOCS) {
+      for (const [, name, body] of readFileSync(path, 'utf8').matchAll(/<!-- lsc:(\w+) -->([\s\S]*?)<!-- \/lsc:\1 -->/g)) {
+        expect(body, `${repoPath(path)} lsc:${name}`).toMatch(PENDING_MARKERS)
+      }
+    }
   })
 
   it('before the live ceremony the block says it is only a plan', () => {

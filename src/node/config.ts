@@ -213,15 +213,27 @@ export function renderStatusBlock(c: StewardshipConfig): string {
   return ['**Status:** performed live on a Bee node, not only rehearsed.', '', ...lines].join('\n')
 }
 
+/** Every document with generated blocks. */
+export const SYNCED_DOCS = [PATHS.stewardship, PATHS.readme, PATHS.readWithoutUs, PATHS.handoffLog] as const
+
+/** Words that only appear in a generated block before the live ceremony has filled it in. */
+export const PENDING_MARKERS = /not made yet|no batch yet|created by the first live hand-off|made by keys init|not yet in force|not yet performed|bought before the live ceremony/
+
+/** Fills every generated block in one document's text. Pure, so tests can run it on the real files. */
+export function renderDocs(text: string, config: StewardshipConfig): string {
+  let out = block('successor', renderSuccessorBlock(config), text)
+  out = block('identities', renderIdentitiesBlock(config), out)
+  out = block('anchor', renderAnchorBlock(config), out)
+  out = block('status', renderStatusBlock(config), out)
+  return out
+}
+
 export function syncDocs(config: StewardshipConfig = loadConfig()): string[] {
   const touched: string[] = []
-  for (const path of [PATHS.stewardship, PATHS.readme, PATHS.readWithoutUs]) {
+  for (const path of SYNCED_DOCS) {
     if (!existsSync(path)) continue
     const before = readFileSync(path, 'utf8')
-    let after = block('successor', renderSuccessorBlock(config), before)
-    after = block('identities', renderIdentitiesBlock(config), after)
-    after = block('anchor', renderAnchorBlock(config), after)
-    after = block('status', renderStatusBlock(config), after)
+    const after = renderDocs(before, config)
     if (after !== before) {
       writeFileSync(path, after)
       touched.push(path)
