@@ -47,7 +47,7 @@ The public addresses for every role are listed here and in `stewardship.config.j
 <!-- lsc:identities -->
 | Role | Who | Address (public) |
 |---|---|---|
-| Payer (storage custodian) | the shared Bee node's wallet | _(no batch yet: `npm run cli -- storage buy` or `storage use` fills this in)_ |
+| Payer (storage custodian) | the shared Bee node's wallet | `0x9452a51F8b43239b8572C08253E4b7ECAf339cb8` |
 | Council scribe (owns the registry feed) | held by the council secretary | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
 | Steward key | Ngawang Dorje (hemis) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
 | Steward key | Padma Chodon (tabo) | _(key not made yet: `npm run cli -- keys init` fills this in at the start of the live ceremony)_ |
@@ -151,7 +151,7 @@ registry topic (hex)            : f17e2832a227f4efaf7867e0d8f9ba14fa070ef851fb46
 registry feed manifest          : (created by the first live hand-off)
 catalogue topic                 : lsc/catalogue/v1  (5585bf7626ca42b72333dfda4e6a6bf7118861a23e4e2b026a727e0e9db1249f)
 corrections topic               : lsc/corrections/v1  (2cf9be53bb7408cee80ea7678ddcb7700e4ae3167670105625954316124ee633)
-postage batch (open to top-ups) : (bought before the live ceremony: npm run cli -- storage buy)
+postage batch (open to top-ups) : 65c1e84317fa4a5f469bd5b53180edaab7c2fc7fa5d66b4c2bbe86a749a6038c
 ```
 <!-- /lsc:anchor -->
 

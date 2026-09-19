@@ -66,9 +66,9 @@
     }
   ],
   "payer": {
-    "batchId": null,
+    "batchId": "65c1e84317fa4a5f469bd5b53180edaab7c2fc7fa5d66b4c2bbe86a749a6038c",
     "batchLabel": "lsc-catalogue",
-    "nodeAddress": null,
+    "nodeAddress": "0x9452a51F8b43239b8572C08253E4b7ECAf339cb8",
     "role": "The Bee node wallet. It owns every postage batch on this shared node and pays for storage. It never signs catalogue or registry updates."
   },
   "registryManifest": null,

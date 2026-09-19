@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "at": "2026-09-19T05:44:49.172Z",
+    "action": "buy",
+    "batchId": "65c1e84317fa4a5f469bd5b53180edaab7c2fc7fa5d66b4c2bbe86a749a6038c",
+    "payer": "0x9452a51F8b43239b8572C08253E4b7ECAf339cb8",
+    "detail": "5 MB for 14 days",
+    "costBzz": "0.6546056628404224",
+    "ttlDaysBefore": null,
+    "ttlDaysAfter": 14,
+    "expiresAfter": "2026-10-03T05:43:39.171Z"
+  }
+]
