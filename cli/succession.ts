@@ -48,9 +48,10 @@ keys.command('list').description('public addresses of every role').action(() => 
 
 // ── storage: the payer ──────────────────────────────────────────────────────
 const storage = program.command('storage').description('the payer: postage batch status, purchase, extension and top-up')
-storage.command('status').action(async () => void (await storageStatusCmd(ctx(bee()))))
+storage.command('status').description('days of storage left on the batch, and who pays for it').action(async () => void (await storageStatusCmd(ctx(bee()))))
 storage
   .command('buy')
+  .description('the node wallet (the payer) buys a new batch and waits until it is usable')
   .requiredOption('--mb <n>', 'size in megabytes', Number)
   .requiredOption('--days <n>', 'duration in days', Number)
   .option('--label <label>')
@@ -59,6 +60,7 @@ storage
 storage.command('use <batchId>').description('adopt an existing batch').action(async (id: string) => storageUse(ctx(bee()), id))
 storage
   .command('cost')
+  .description('quote an extension of the current batch, or a new batch (nothing is spent)')
   .requiredOption('--days <n>', 'days', Number)
   .option('--mb <n>', 'also quote a new batch of this size', Number)
   .action(async (o) => storageCost(ctx(bee()), o))
@@ -81,15 +83,17 @@ const catalogue = program.command('catalogue').description('the steward publishe
 catalogue
   .command('publish')
   .requiredOption('--as <steward>', 'steward key name, e.g. steward-padma')
+  .description('sign the next catalogue version with the steward key, folding in library corrections')
   .option('--summary <text>')
   .action(async (o) => void (await cataloguePublish(ctx(bee()), o)))
-catalogue.command('show').action(async () => void (await read({ bee: bee() })))
+catalogue.command('show').description('same as read: the catalogue as a stranger sees it').action(async () => void (await read({ bee: bee() })))
 
 // ── corrections: any library ────────────────────────────────────────────────
 program
   .command('correction')
   .description('a library posts a signed correction to its own feed')
   .command('submit')
+  .description('sign a correction with the library key and post it to the library’s own feed')
   .requiredOption('--as <library>', 'library id, e.g. tabo')
   .requiredOption('--record <id>', 'record id, e.g. TABO-0003')
   .option('--set <key=value...>', 'condition=damaged | photographed=true | folios=180', [])
@@ -168,12 +172,14 @@ succession
 // ── housekeeping ────────────────────────────────────────────────────────────
 program
   .command('config')
+  .description('keep the documents in step with stewardship.config.json')
   .command('sync')
   .description('refresh the generated blocks in README, STEWARDSHIP, HANDOFF_LOG and docs/READ_WITHOUT_US from stewardship.config.json')
   .action(() => console.log(syncDocs().map(repoPath).join('\n') || 'already in sync'))
 
 program
   .command('audit')
+  .description('checks on what is tracked in git')
   .command('secrets')
   .description('fail if any private key, mnemonic, gift code or credential URL is in a tracked file')
   .action(() => {
@@ -187,7 +193,7 @@ program
     process.exitCode = 1
   })
 
-program.command('version').action(() => {
+program.command('version').description('the pinned bee-js and ethers versions').action(() => {
   const pkg = JSON.parse(readFileSync(resolve(ROOT, 'package.json'), 'utf8')) as { dependencies: Record<string, string> }
   console.log(`bee-js ${pkg.dependencies['@ethersphere/bee-js']}, ethers ${pkg.dependencies.ethers}`)
 })
