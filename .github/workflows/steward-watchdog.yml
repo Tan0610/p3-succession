@@ -1,0 +1,97 @@
+# A robot checks every day, in public, that the catalogue is still reachable,
+# still paid for, and that the steward is still publishing. When a charter
+# trigger is met (T2 silence, T3 storage under 30 days) or something cannot be
+# confirmed, it opens ONE issue titled "Stewardship alert: …" (or updates the
+# one already open) with the plain-language report, the permissionless top-up
+# recipe and the succession procedure. When everything is clear again it closes
+# that issue.
+#
+# No secrets: it reads public data through a public Swarm gateway with
+# `npm run watchdog`. It never signs, uploads or pays. An alert is not a failed
+# run; only a watchdog that cannot run at all (exit 3+) fails the job.
+name: Steward watchdog
+
+on:
+  schedule:
+    - cron: '17 6 * * *' # every day, 06:17 UTC
+  workflow_dispatch:
+    inputs:
+      gateway:
+        description: Bee node or gateway to read through
+        required: false
+        default: https://api.gateway.ethswarm.org
+      unanswered:
+        description: Libraries reporting unanswered written requests (T2's second half)
+        required: false
+        default: '0'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: steward-watchdog
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check the catalogue (keyless, read-only)
+        id: watch
+        env:
+          WATCHDOG_GATEWAY: ${{ inputs.gateway || 'https://api.gateway.ethswarm.org' }}
+          UNANSWERED: ${{ inputs.unanswered || '0' }}
+        run: |
+          set +e
+          npm run --silent watchdog -- --unanswered "$UNANSWERED" --report-file watchdog-report.md | tee watchdog-report.txt
+          code=${PIPESTATUS[0]}
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ -f watchdog-report.md ]; then cat watchdog-report.md >> "$GITHUB_STEP_SUMMARY"; fi
+          # 0 all clear · 1 trigger met · 2 not confirmed: all are answers, not failures
+          if [ "$code" -gt 2 ]; then exit "$code"; fi
+          exit 0
+
+      - name: Open or update the stewardship alert issue
+        if: steps.watch.outputs.code == '1' || steps.watch.outputs.code == '2'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: ${{ steps.watch.outputs.title }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json number,title \
+            --jq '[.[] | select(.title | startswith("Stewardship alert"))] | sort_by(.number) | .[0] // empty | "\(.number)\t\(.title)"')
+          if [ -z "$existing" ]; then
+            url=$(gh issue create --repo "$GITHUB_REPOSITORY" --title "$TITLE" --body-file watchdog-report.md)
+            echo "Opened $url" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            number=${existing%%$'\t'*}
+            previous=${existing#*$'\t'}
+            gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --body-file watchdog-report.md
+            if [ "$previous" != "$TITLE" ]; then
+              gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body "The findings changed on $(date -u +%F): **$TITLE** ([run]($RUN_URL))."
+            fi
+            echo "Updated issue #$number (no duplicate opened)" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Close the alert issue when everything is clear
+        if: steps.watch.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          for number in $(gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json number,title \
+            --jq '.[] | select(.title | startswith("Stewardship alert")) | .number'); do
+            gh issue close "$number" --repo "$GITHUB_REPOSITORY" \
+              --comment "All clear on $(date -u +%F): reachable, paid for above the floor, steward publishing ([run]($RUN_URL))."
+          done
