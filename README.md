@@ -1,5 +1,32 @@
 # The succession nobody wrote down
 
+## 60-second tour
+
+**What it is.** A manuscript catalogue shared by seven Himalayan monastery libraries, kept on Swarm, that keeps working when its steward stops answering. Readers start from one register address that never moves. The steward changes only when 4 of the 7 library seals and the newcomer's own signature say so, and every reader re-checks those seals.
+
+**Proven live on Swarm mainnet, 2026-09-19 (not only simulated):**
+
+- **Register, same address before and after:** council scribe `0xB3959e06E1edE30605Ed3136C857cC57B0a64af0`, topic `lsc/registry/v1`, feed manifest `37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2`. Update #0 is **epoch 0**, the genesis naming Ngawang Dorje. Update #1 is **epoch 1**, the hand-off to **Padma Chodon**, who named Stanzin Namgyal as next.
+- **Seals used:** epoch 0 had Hemis, Thiksey, Diskit and Lamayuru (4 of 4 required). Epoch 1 had Hemis, Alchi, Tabo and Kye (4 of 4). Ngawang's key was **not** used to hand over.
+- **Refused on the live node first:** the outgoing steward signing for Hemis (0 valid seals of 4), then only 3 of 7 libraries sealing (3 of 4). Both are recorded in the evidence file.
+- **Corrections without the steward:** Tabo and Kye signed corrections onto their own feeds. Padma's first catalogue (v2) applied Tabo's correction to its own shelf (TABO-0001) and kept Kye's note about a Hemis work (HMS-0001) as a proposal for Hemis to confirm.
+- **Storage extended, not only bought:** `storage extend` took batch `65c1e843…a6038c` from **14 → 15 days** for 0.0468 xBZZ ([STORAGE_LOG.md](STORAGE_LOG.md)).
+- **Keyless public-gateway read:** the register, Padma's catalogue, the hand-off evidence and the batch's remaining days all read through `https://api.gateway.ethswarm.org` with no keys (commands below).
+- **Watched every day, in public:** a keyless GitHub Action re-reads all of this daily and opens **one** issue when a charter trigger is met. With the short demo batch (15 days, 30-day floor), trigger T3 *is* met, so the first run [opened issue #1](https://github.com/Tan0610/p3-succession/issues/1) with the recipe any library can use to top up. That is the arrangement working as written. See [The daily watchdog](#the-daily-watchdog).
+
+Evidence: [HANDOFF_LOG.md](HANDOFF_LOG.md), [handoffs/2026-09-19-epoch-0.json](handoffs/2026-09-19-epoch-0.json), [handoffs/2026-09-19-epoch-1.json](handoffs/2026-09-19-epoch-1.json), [STORAGE_LOG.md](STORAGE_LOG.md). Then read [If Ngawang stops answering tomorrow](#if-ngawang-stops-answering-tomorrow) (reachable, paid for, correctable, run by someone else) and [How each check is met](#how-each-check-is-met) (every check mapped to `file` › `function` and a test).
+
+**Check it yourself, no keys and no node** (after `npm ci`):
+
+```sh
+npm run cli -- read --bee https://api.gateway.ethswarm.org                  # register → Padma → catalogue v2, seals re-counted
+npm run verify:handoff -- handoffs/2026-09-19-epoch-1.json --bee https://api.gateway.ethswarm.org
+curl https://api.gateway.ethswarm.org/bzz/37eff4d56efe327da23b92cf60a692677053a854903a8e7f205cea3a12c291f2/   # the register's latest entry, as JSON
+npm run watchdog                                                            # reachable? paid for? steward still publishing?
+```
+
+---
+
 Seven monastery libraries across Ladakh and Spiti share one manuscript catalogue. For nine years one man, Ngawang Dorje, renewed its storage, held the only key that could publish it, and typed in everyone's corrections. This repository is the arrangement that lets the catalogue outlive him, and outlive whoever comes after him.
 
 The short version:
@@ -25,6 +52,7 @@ The short version:
 | checking what's technically possible | [docs/MECHANISMS.md](docs/MECHANISMS.md): who can pay, publish and decide, with sources |
 | checking the hand-off happened | [HANDOFF_LOG.md](HANDOFF_LOG.md), `handoffs/*.json`, `npm run verify:handoff` |
 | checking storage is paid | [STORAGE_LOG.md](STORAGE_LOG.md), `ledger/storage.json`, `npm run cli -- storage status` |
+| checking it is still alive today | `npm run watchdog` (keyless, public gateway), and the daily [watchdog](#the-daily-watchdog) issue |
 
 The public anchor:
 
@@ -48,6 +76,23 @@ postage batch (open to top-ups) : 65c1e84317fa4a5f469bd5b53180edaab7c2fc7fa5d66b
 | **paid for** | The rent sits in the PostageStamp contract on Gnosis Chain, not with Ngawang. `PostageStamp.topUp` has no owner check, so any library tops up the batch printed above from its own wallet, and the node's operator can run `storage extend`. | [two commands in docs/MECHANISMS.md](docs/MECHANISMS.md#topping-up-from-your-own-wallet-no-node-no-permission), [STORAGE_LOG.md](STORAGE_LOG.md) (ceremony step 5 extends the live batch), `npm run cli -- storage status` |
 | **correctable by the other six** | Each library signs corrections about its own shelves onto its own feed (`npm run cli -- correction submit --as kye …`). Readers see them at once. The next steward applies them automatically; a note about another library's shelf is kept as a proposal for that library. | ceremony step 4 (Tabo and Kye post, a keyless reader sees them), step 7 (Padma folds them in, logged in [HANDOFF_LOG.md](HANDOFF_LOG.md)), [STEWARDSHIP.md](STEWARDSHIP.md) §6 |
 | **run by someone else** | 4 of the 7 library seals and Padma's own acceptance move the register to her. Ngawang's key is never used. | [HANDOFF_LOG.md](HANDOFF_LOG.md) epoch 1, `npm run verify:handoff` |
+| **watched, even if nobody remembers to look** | A robot checks every day and raises its hand in public if the rent is running low or the steward goes quiet. It needs no keys and no node of ours. | [The daily watchdog](#the-daily-watchdog), `npm run watchdog` |
+
+## The daily watchdog
+
+A robot checks every day and raises its hand in public if the lamp is running low or the steward goes quiet.
+
+`npm run watchdog` (`scripts/watchdog.ts` → `src/core/watchdog.ts` › `gatherFacts()`, `assess()`) reads only public facts from the tracked `stewardship.config.json` (scribe address, register topic and manifest, batch id) and asks a public gateway (`https://api.gateway.ethswarm.org`, or `--gateway` / `WATCHDOG_GATEWAY`):
+
+1. **Reachable?** It walks the register and re-checks every entry's seals with the same reader code as everyone else (`src/core/resolve.ts` › `readRegistry()`, via the keyless `HttpFeedStore`), follows it to the current steward's catalogue, and checks that the stable `/bzz/<manifest>/` address answers.
+2. **Paid for?** It finds the batch in the gateway's `GET /batches` (the public list of every live batch, about 80 kB, about a second) and reads its `batchTTL`.
+3. **Still published?** It takes the current steward's last `publishedAt` and evaluates **T2** (silence) and **T3** (storage under the floor) with the charter's own numbers from the genesis entry, using `src/core/triggers.ts` › `evaluateTriggers()`, the same function as `succession check-trigger`.
+
+It prints a plain-language report, for example *"Catalogue reachable ✓, current steward Padma Chodon, last update 0 day(s) ago, storage paid ~15 days — T3 MET: any library may top up; here's how"*, followed by the permissionless top-up commands from [docs/MECHANISMS.md](docs/MECHANISMS.md#topping-up-from-your-own-wallet-no-node-no-permission) with the batch filled in. Exit code **0** means all clear, **1** means a trigger is met, **2** means reachability or storage could not be confirmed.
+
+[`.github/workflows/steward-watchdog.yml`](.github/workflows/steward-watchdog.yml) runs it daily (and on demand), with no secrets and only `issues: write, contents: read`. On exit 1 or 2 it opens **one** issue titled `Stewardship alert: …`, or updates the one already open, instead of adding duplicates. The issue holds the report, the top-up recipe and a pointer to the hand-off procedure in [STEWARDSHIP.md](STEWARDSHIP.md) §5. When every check is clear again, it closes the issue. An alert is an answer, not a failed run. Tests: `test/watchdog.test.ts`.
+
+*Honest note:* the robot cannot see whether libraries' letters to the steward went unanswered, which is the second half of T2. It raises the alarm at 60 quiet days, and T2 is met once two libraries confirm (`npm run watchdog -- --unanswered 2`).
 
 ## Try it in two minutes, no node needed
 
@@ -122,7 +167,7 @@ Every pointer is `file` › `function`. Each row names the code path, the thing 
 - **Storage custody is not separated.** Everything runs on one shared Bee node, and every postage batch belongs to its wallet. Anyone can *top up* (it's permissionless on-chain), but only that node can stamp uploads. A second node with its own batch would be the real fix.
 - **One person performs the whole demonstration.** All eleven keys (seven committees, three stewards, the scribe) are generated on one machine, in its git-ignored `.secrets/`. Every evidence file says so in its `honesty` field. In real use each library and steward generates their own key and shares only the address.
 - **The T2 silence period was declared, not waited out.** The 60-day clock is exercised in the rehearsal and the tests; the live run records that the committees declared T2.
-- **The demonstration batch is small and short-lived** (5 MB, 14 days). Below 30 days of paid storage, `storage status` and `check-trigger` report trigger T3 as met until someone tops it up. That is the arrangement working as written, not a bug.
+- **The demonstration batch is small and short-lived** (5 MB, 14 days). Below 30 days of paid storage, `storage status`, `check-trigger` and the daily watchdog report trigger T3 as met until someone tops it up (the watchdog's open issue says so in public). That is the arrangement working as written, not a bug.
 - **The catalogue entries are illustrative sample data**, not a real inventory.
 - **Losing the scribe key freezes the register** (the catalogue stays readable). Mirror registries kept by several libraries would remove that single point of failure. See [docs/MECHANISMS.md](docs/MECHANISMS.md).
 
