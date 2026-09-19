@@ -185,8 +185,12 @@ async function live() {
   act(`6. ${first.name} goes quiet. The committees move to hand over to ${incoming.name}.`)
   c = fresh()
   const reg = await readRegistry(readStore, anchor)
-  if (!sameAddress(reg.current?.entry?.steward.address, first.address)) say('already handed over')
-  else {
+  const stewardNow = reg.current?.entry?.steward.address ?? null
+  if (sameAddress(stewardNow, incoming.address)) say('already handed over')
+  else if (!sameAddress(stewardNow, first.address)) {
+    // never guess from a registry read that came back short: stop, and let a re-run resume here
+    throw new Error(`The registry names ${stewardNow ?? 'nobody'} as steward, not ${first.name}. If the node is still catching up, re-run: the ceremony resumes.`)
+  } else {
     const { path, proposal } = await propose(c, { incoming: incoming.address!, next: next.address!, trigger: 'T2-silence' })
     const charter = charterFromConfig(c.config)
     const needed = requiredThreshold(charter, reg.current?.entry ?? null, proposal.fields.incoming.address)
